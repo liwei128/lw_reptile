@@ -30,6 +30,7 @@ public class MonitorNetworkTask implements Task{
 		Runnable runnable = new Runnable() {
 			@Override
 			public void run() {
+				logger.info("内存占用："+Runtime.getRuntime().totalMemory()/1024/1024+"M");
 				if(isBrokenNetwork()){
 					if(StatusManage.isNetwork){
 						logger.error("网络连接已断开。。。");
