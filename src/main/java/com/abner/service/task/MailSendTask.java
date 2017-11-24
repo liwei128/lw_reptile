@@ -88,6 +88,7 @@ public class MailSendTask implements Task{
 		Long doneImg = monitorData.get(MonitorName.DONEIMG.name());
 		Long failImg = monitorData.get(MonitorName.FAILIMG.name());
 		double imgRate = CommonUtil.calculateRate(doneImg, failImg);
+		long memory = Runtime.getRuntime().totalMemory()/1024/1024;
 		//组装邮件内容
 		StringBuilder stringBuilder = new StringBuilder();
 		stringBuilder.append("<span>已探测到链接数：").append(sumUrl).append("&nbsp;&nbsp;&nbsp;")
@@ -97,7 +98,8 @@ public class MailSendTask implements Task{
 		.append("<span>已探测到图片数：").append(sumImg).append("&nbsp;&nbsp;&nbsp;")
 		.append("已下载图片数：").append(doneImg).append("&nbsp;&nbsp;&nbsp;")
 		.append("图片下载失败数：").append(failImg).append("&nbsp;&nbsp;&nbsp;")
-		.append("图片下载失败率：").append(imgRate).append("%").append("</span><br/><br/>")
+		.append("图片下载失败率：").append(imgRate).append("%").append("</span><br/>")
+		.append("<span>内存占用：").append(memory).append("M</span><br/>")
 		.append("<a href='http://www.baidu.com/'>版权所有-李威</a></body>");
 		return stringBuilder.toString();
 	}
