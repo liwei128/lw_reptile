@@ -181,16 +181,11 @@ public abstract class AbstractReptileFunction {
 	}
 	//打开视图
 	public void openView(){
-		int i = 0;
 		initView();
 		getShell().open();
 		while (!getShell().isDisposed()) {
-			i++;
-			//监控信息(降低频率)
-			if(i==10){
-				loadMonitorData();
-				i=0;
-			}
+			//监控信息
+			loadMonitorData();
 			//日志输出
 			loadLog();
 			//断网提示
