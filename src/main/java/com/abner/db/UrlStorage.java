@@ -105,8 +105,15 @@ public class UrlStorage {
 					return  false;
 				}
 			}
-			return true;
 		}
+		synchronized (IMGLOCK) {
+			for(MyUrl myUrl:IMGURLS){
+				if(!myUrl.isAlreadyLoad()){
+					return  false;
+				}
+			}
+		}
+		return true;
 	}
 	/**
 	 * 添加链接集合
