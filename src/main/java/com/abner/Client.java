@@ -11,8 +11,7 @@ public class Client {
 	
 	public static void main(String[] args) {gitgit
 		//开启视图
-
-		ReptileView eweweqwe = new ReptileView();
+		String df="12324324";
 
 	}
 }
