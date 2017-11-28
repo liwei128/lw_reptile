@@ -11,8 +11,8 @@ public class Client {
 	
 	public static void main(String[] args) {
 		//开启视图
-		String ww="wqe";
-		/*new ReptileView();*/
-		
+
+		ReptileView eweweqwe = new ReptileView();
+
 	}
 }
