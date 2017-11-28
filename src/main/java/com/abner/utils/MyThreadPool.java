@@ -95,7 +95,7 @@ public class MyThreadPool {
 	 * 上次执行结束到下次执行开始时间间隔 
 	 * @param command 线程
 	 * @param initialDelay 初始延迟
-	 * @param period 时间间隔
+	 * @param delay 时间间隔
 	 * @param unit   时间单位   
 	 * void
 	 * @return 

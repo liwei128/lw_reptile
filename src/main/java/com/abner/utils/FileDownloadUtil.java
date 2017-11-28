@@ -23,6 +23,7 @@ import com.abner.pojo.MyUrl;
  * @author wei.li
  * @time 2017年11月28日上午10:27:42
  */
+
 public class FileDownloadUtil{
 	
 	private static  Logger logger=Logger.getLogger(FileDownloadUtil.class);
