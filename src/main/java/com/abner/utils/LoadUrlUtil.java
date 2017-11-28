@@ -20,7 +20,11 @@ import com.abner.manage.FilePathManage;
 import com.abner.enums.MonitorName;
 import com.abner.pojo.MyUrl;
 import com.google.common.collect.Lists;
-
+/**
+ * 链接地址抓取工具
+ * @author wei.li
+ * @time 2017年11月28日上午10:28:10
+ */
 public class LoadUrlUtil{
 	
 	private static  Logger logger=Logger.getLogger(LoadUrlUtil.class);

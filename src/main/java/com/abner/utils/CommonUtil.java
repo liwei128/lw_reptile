@@ -21,7 +21,11 @@ import org.apache.log4j.Logger;
 import com.abner.manage.Config;
 import com.abner.manage.FilePathManage;
 import com.abner.pojo.MyUrl;
-
+/**
+ * 公共工具类
+ * @author wei.li
+ * @time 2017年11月28日上午10:26:53
+ */
 public class CommonUtil {
 	
 	private static  Logger logger=Logger.getLogger(CommonUtil.class);
