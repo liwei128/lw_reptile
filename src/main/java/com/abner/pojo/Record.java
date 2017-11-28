@@ -22,9 +22,11 @@ public class Record {
 	private long getNumByMillis(long timeMillis){
 		long num=0L;
 		long nowTime = System.currentTimeMillis();
-		for(int i=0;i<times.size();i++){
+		for(int i = times.size()-1;i>=0;i--){
 			if(nowTime-times.get(i)<timeMillis){
 				num++;
+			}else{
+				return num;
 			}
 		}
 		return num;

@@ -10,7 +10,11 @@ import org.apache.log4j.Logger;
 
 import java.util.Date;
 import java.util.Properties;
-
+/**
+ * 邮件发送工具类
+ * @author wei.li
+ * @time 2017年11月28日上午10:27:14
+ */
 public class EmailSendUtils {
 	
 	private static  Logger logger=Logger.getLogger(EmailSendUtils.class);

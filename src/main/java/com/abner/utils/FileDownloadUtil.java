@@ -18,6 +18,11 @@ import com.abner.db.MonitorDataStorage;
 import com.abner.manage.Config;
 import com.abner.enums.MonitorName;
 import com.abner.pojo.MyUrl;
+/**
+ * 文件下载工具类
+ * @author wei.li
+ * @time 2017年11月28日上午10:27:42
+ */
 
 public class FileDownloadUtil{
 	

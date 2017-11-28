@@ -21,7 +21,11 @@ import org.apache.log4j.Logger;
 import com.abner.manage.Config;
 import com.abner.manage.FilePathManage;
 import com.abner.pojo.MyUrl;
-
+/**
+ * 公共工具类
+ * @author wei.li
+ * @time 2017年11月28日上午10:26:53
+ */
 public class CommonUtil {
 	
 	private static  Logger logger=Logger.getLogger(CommonUtil.class);
@@ -34,7 +38,7 @@ public class CommonUtil {
 		String url = imgUrl.getUrl();
 		String title = imgUrl.getTitle();
 		//文件名设置
-		String suffix = url.substring(url.lastIndexOf(".")); 
+		String suffix = url.substring(url.lastIndexOf("."));
 		String fileName = UUID.randomUUID().toString()+suffix;
 		//检查目录是否存在
 		File file = new File(Config.filePath+title);
