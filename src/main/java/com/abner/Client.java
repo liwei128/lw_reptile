@@ -1,5 +1,6 @@
 package com.abner;
 
+
 import com.abner.view.ReptileView;
 /**
  * 程序入口
@@ -10,6 +11,7 @@ public class Client {
 	
 	public static void main(String[] args) {
 		//开启视图
-		/*new ReptileView();*/
+		new ReptileView();
+
 	}
 }
