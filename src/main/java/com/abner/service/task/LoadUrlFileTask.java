@@ -1,7 +1,11 @@
 package com.abner.service.task;
 
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.List;
 
+import com.abner.utils.JsonUtil;
+import com.google.common.reflect.TypeToken;
 import org.apache.log4j.Logger;
 
 import com.abner.annotation.Service;
@@ -10,7 +14,6 @@ import com.abner.manage.FilePathManage;
 import com.abner.pojo.MyUrl;
 import com.abner.enums.TaskName;
 import com.abner.utils.CommonUtil;
-import com.alibaba.fastjson.JSON;
 /**
  * 读取历史url
  * @author wei.li
@@ -27,9 +30,9 @@ public class LoadUrlFileTask implements Task{
 		List<MyUrl> imgUrls=null;
 		try{
 			String reqUrlsStr = CommonUtil.readFileToString(FilePathManage.reqUrls);
-			reqUrls = JSON.parseArray(reqUrlsStr, MyUrl.class);
+			reqUrls = JsonUtil.toList(reqUrlsStr, MyUrl.class);
 			String imgUrlsStr = CommonUtil.readFileToString(FilePathManage.imgUrls);
-			imgUrls = JSON.parseArray(imgUrlsStr, MyUrl.class);
+			imgUrls = JsonUtil.toList(imgUrlsStr, MyUrl.class);
 		}catch(Exception e){
 			logger.error("加载历史url失败",e);
 		}

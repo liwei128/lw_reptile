@@ -1,6 +1,6 @@
 package com.abner.pojo;
 
-import com.alibaba.fastjson.JSON;
+import com.abner.utils.JsonUtil;
 
 /**
  * Phantomjs进程bean
@@ -30,7 +30,7 @@ public class PhantomjsProcesses {
 	
 	@Override
 	public String toString() {
-		return JSON.toJSONString(this);
+		return JsonUtil.toString(this);
 	}
 	
 	
