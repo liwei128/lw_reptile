@@ -5,7 +5,8 @@ import com.abner.manage.Config;
 import com.abner.manage.FilePathManage;
 import com.abner.enums.TaskName;
 import com.abner.utils.CommonUtil;
-import com.alibaba.fastjson.JSON;
+import com.abner.utils.JsonUtil;
+
 /**
  * 用户配置保存服务
  * @author wei.li
@@ -17,7 +18,7 @@ public class SaveUserSettingTask implements Task{
 	@Override
 	public void execute() {
 		CommonUtil.checkPath(FilePathManage.configPath);
-		CommonUtil.writeToFile(JSON.toJSONString(Config.userSetting), FilePathManage.userSetting);
+		CommonUtil.writeToFile(JsonUtil.toString(Config.userSetting), FilePathManage.userSetting);
 	}
 
 	@Override

@@ -5,7 +5,7 @@ import com.abner.db.UrlStorage;
 import com.abner.manage.FilePathManage;
 import com.abner.enums.TaskName;
 import com.abner.utils.CommonUtil;
-import com.alibaba.fastjson.JSON;
+import com.abner.utils.JsonUtil;
 /**
  * 链接地址保存服务
  * @author wei.li
@@ -17,9 +17,9 @@ public class SaveAddressTask implements Task{
 	@Override
 	public void execute() {
 		CommonUtil.checkPath(FilePathManage.configPath);
-		String reqUrls = JSON.toJSONString(UrlStorage.getUrls(),true);
+		String reqUrls = JsonUtil.toString(UrlStorage.getUrls());
 		CommonUtil.writeToFile(reqUrls, FilePathManage.reqUrls);
-		String imgUrls = JSON.toJSONString(UrlStorage.getImgs(),true);
+		String imgUrls = JsonUtil.toString(UrlStorage.getImgs());
 		CommonUtil.writeToFile(imgUrls, FilePathManage.imgUrls);
 	}
 

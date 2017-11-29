@@ -1,6 +1,7 @@
 package com.abner.pojo;
 
-import com.alibaba.fastjson.JSON;
+
+import com.abner.utils.JsonUtil;
 
 /**
  * 链接地址实体类
@@ -66,7 +67,7 @@ public class MyUrl{
 
 	@Override
 	public String toString() {
-		return JSON.toJSONString(this);
+		return JsonUtil.toString(this);
 	}
 
 	public MyUrl(String title, String url) {
