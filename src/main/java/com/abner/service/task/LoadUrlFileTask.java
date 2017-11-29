@@ -1,11 +1,8 @@
 package com.abner.service.task;
 
-import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.List;
 
 import com.abner.utils.JsonUtil;
-import com.google.common.reflect.TypeToken;
 import org.apache.log4j.Logger;
 
 import com.abner.annotation.Service;

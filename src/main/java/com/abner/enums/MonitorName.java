@@ -4,9 +4,8 @@ package com.abner.enums;
  * @author wei.li
  * @time 2017年11月23日下午1:06:58
  */
-@SuppressWarnings("ALL")
 public enum MonitorName {
-	@SuppressWarnings("AlibabaEnumConstantsMustHaveComment") DONEURL(1,"已抓取链接数"),
+	DONEURL(1,"已抓取链接数"),
 	DONEIMG(2,"已下载图片数"),
 	SUMURL(3,"已探测到链接数"),
 	SUMIMG(4,"已探测到图片数"),
