@@ -38,7 +38,7 @@ public class ImgDownloadTask implements Task{
 				if(!StatusManage.isNetwork){
 					return;
 				}
-				List<MyUrl> imgurls = UrlStorage.getNeedImgs(Config.velocity*10);
+				List<MyUrl> imgurls = UrlStorage.getNeedImgs(Config.velocity*20);
 				logger.info("图片下载队列："+imgurls.size());
 				if(imgurls.size()==0){
 					StatusManage.imgFinish = true;

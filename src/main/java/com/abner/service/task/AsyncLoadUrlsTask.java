@@ -41,7 +41,7 @@ public class AsyncLoadUrlsTask implements Task{
 					return;
 				}
 				//获取需要抓取的url
-				List<MyUrl> urls = UrlStorage.getNeedUrls(Config.velocity);
+				List<MyUrl> urls = UrlStorage.getNeedUrls(Config.velocity*2);
 				if(urls.size()==0){
 					StatusManage.urlFinish = true;
 					return;

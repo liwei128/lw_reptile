@@ -240,20 +240,12 @@ public class ReptileView extends AbstractReptileFunction{
         velocity.add("3");
         velocity.add("4");
         velocity.add("5");
-        velocity.add("6");
-        velocity.add("7");
-        velocity.add("8");
-        velocity.add("9");
         velocity.setData("0", 1);
         velocity.setData("1", 2);
         velocity.setData("2", 3);
         velocity.setData("3", 4);
         velocity.setData("4", 5);
-        velocity.setData("5", 6);
-        velocity.setData("6", 7);
-        velocity.setData("7", 8);
-        velocity.setData("8", 9);
-        velocity.select(1);
+        velocity.select(0);
         velocity.setLocation(80,190);
         velocity.setSize(100, 20);
         
