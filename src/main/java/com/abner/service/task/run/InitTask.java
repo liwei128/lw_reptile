@@ -13,7 +13,7 @@ import com.google.common.collect.Lists;
  * @author wei.li
  * @time 2017年11月23日下午1:22:05
  */
-@Service(name = TaskName.INIT)
+@Service(TaskName.INIT)
 public class InitTask implements Task{
 	
 	@Override

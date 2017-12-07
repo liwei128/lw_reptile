@@ -20,7 +20,7 @@ import com.abner.utils.MyThreadPool;
  * @author wei.li
  * @time 2017年11月23日下午1:26:41
  */
-@Service(name = TaskName.MAILSEND)
+@Service(TaskName.MAILSEND)
 public class MailSendTask implements Task{
 	
 	private static  Logger logger=Logger.getLogger(MailSendTask.class);

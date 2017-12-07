@@ -15,5 +15,5 @@ import com.abner.enums.TaskName;
 @Inherited
 public @interface Service {
 	
-	TaskName name();//服务名
+	TaskName value();//服务名
 }

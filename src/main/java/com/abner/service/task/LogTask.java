@@ -20,7 +20,7 @@ import com.abner.enums.TaskName;
  * @author wei.li
  * @time 2017年11月23日下午1:26:22
  */
-@Service(name = TaskName.LOG)
+@Service(TaskName.LOG)
 public class LogTask implements Task{
 	
 	@SuppressWarnings("resource")

@@ -12,7 +12,7 @@ import com.google.common.collect.Lists;
  * @author wei.li
  * @time 2017年11月23日下午1:22:20
  */
-@Service(name = TaskName.RUN)
+@Service(TaskName.RUN)
 public class RunTask implements Task{
 	
 	@Override

@@ -38,7 +38,7 @@ public class TaskFactory {
 					enhancer.setCallback(new TaskInterceptor(clazz));  
 					Task agencyTask=(Task)enhancer.create();  
 					//装入Map
-					newHashMap.put(service.name(), agencyTask);
+					newHashMap.put(service.value(), agencyTask);
 				}
 			} catch (Exception e) {
 				logger.error("服务初始化失败, ",e);

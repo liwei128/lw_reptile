@@ -12,7 +12,7 @@ import com.abner.pojo.MyUrl;
  * @author wei.li
  * @time 2017年11月23日下午9:01:12
  */
-@Service(name = TaskName.RESTORELINK)
+@Service(TaskName.RESTORELINK)
 public class RestoreLinkTask implements Task{
 
 	@Override

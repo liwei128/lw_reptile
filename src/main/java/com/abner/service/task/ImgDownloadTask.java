@@ -22,7 +22,7 @@ import com.abner.utils.MyThreadPool;
  * @author wei.li
  * @time 2017年11月23日下午1:23:39
  */
-@Service(name = TaskName.IMGDOWNLOAD)
+@Service(TaskName.IMGDOWNLOAD)
 public class ImgDownloadTask implements Task{
 	
 	private static  Logger logger=Logger.getLogger(ImgDownloadTask.class);

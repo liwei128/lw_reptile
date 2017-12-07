@@ -11,7 +11,7 @@ import com.abner.utils.JsonUtil;
  * @author wei.li
  * @time 2017年11月23日下午1:27:38
  */
-@Service(name = TaskName.SAVEADDRESS)
+@Service(TaskName.SAVEADDRESS)
 public class SaveAddressTask implements Task{
 
 	@Override

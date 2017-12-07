@@ -18,7 +18,7 @@ import com.abner.utils.MyThreadPool;
  * @author wei.li
  * @time 2017年6月19日下午3:06:01
  */
-@Service(name = TaskName.MONITORNETWORK)
+@Service(TaskName.MONITORNETWORK)
 public class MonitorNetworkTask implements Task{
 	
 	private static  Logger logger=Logger.getLogger(MonitorNetworkTask.class);

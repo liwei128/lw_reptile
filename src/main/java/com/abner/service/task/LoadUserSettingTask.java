@@ -13,7 +13,7 @@ import com.abner.utils.CommonUtil;
  * @author wei.li
  * @time 2017年11月23日下午1:25:33
  */
-@Service(name = TaskName.LOADUSERSETTING)
+@Service(TaskName.LOADUSERSETTING)
 public class LoadUserSettingTask implements Task{
 	
 	private static  Logger logger=Logger.getLogger(LoadUserSettingTask.class);

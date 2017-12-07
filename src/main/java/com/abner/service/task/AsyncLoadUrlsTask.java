@@ -24,7 +24,7 @@ import com.abner.utils.MyThreadPool;
  * @author wei.li
  * @time 2017年11月23日下午1:22:42
  */
-@Service(name = TaskName.ASYNCLOADURL)
+@Service(TaskName.ASYNCLOADURL)
 public class AsyncLoadUrlsTask implements Task{
 	
 	private static  Logger logger=Logger.getLogger(AsyncLoadUrlsTask.class);

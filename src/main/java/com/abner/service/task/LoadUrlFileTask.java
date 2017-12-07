@@ -16,7 +16,7 @@ import com.abner.utils.CommonUtil;
  * @author wei.li
  * @time 2017年11月23日下午1:25:22
  */
-@Service(name = TaskName.LOADURLFILE)
+@Service(TaskName.LOADURLFILE)
 public class LoadUrlFileTask implements Task{
 	
 	private static  Logger logger=Logger.getLogger(LoadUrlFileTask.class);

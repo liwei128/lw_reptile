@@ -15,7 +15,7 @@ import com.abner.utils.MyThreadPool;
  * @author wei.li
  * @time 2017年11月23日下午1:23:17
  */
-@Service(name = TaskName.CLEANPJS)
+@Service(TaskName.CLEANPJS)
 public class CleanPhantomjsTask implements Task{
 	
 	private static  Logger logger=Logger.getLogger(CleanPhantomjsTask.class);
