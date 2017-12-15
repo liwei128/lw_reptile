@@ -1,8 +1,6 @@
 package com.abner.view;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Display;
@@ -18,6 +16,7 @@ public class ReptileView extends AbstractReptileFunction{
 	
 	private Display display;
 	private Shell shell;
+	private Label ping;
 	private Label urls;
 	private Text urlsText;
 	private Label filePath;
@@ -25,7 +24,6 @@ public class ReptileView extends AbstractReptileFunction{
 	private Text filePathText;
 	private Label fileSize;
 	private Text fileSizeText;
-	private Label network;
 	private Combo combo;
 	private Label comboLable;
 	private Label sumUrl;
@@ -57,7 +55,10 @@ public class ReptileView extends AbstractReptileFunction{
 	private Label isNowDomainLable;
 	
 	
-	
+	@Override
+	public Label getPing() {
+		return ping;
+	}
 	@Override
 	public Text getEmailAddressText() {
 		return emailAddressText;
@@ -86,10 +87,6 @@ public class ReptileView extends AbstractReptileFunction{
 	@Override
 	public Text getFileSizeText() {
 		return fileSizeText;
-	}
-	@Override
-	public Label getNetwork() {
-		return network;
 	}
 	@Override
 	public Button getHideButton() {
@@ -166,18 +163,13 @@ public class ReptileView extends AbstractReptileFunction{
 		shell.setText("图片爬虫");
 		shell.setSize(650, 375);
 		
-		
 		/**
-		 * 断网提示
+		 * ping值
 		 */
-		network = new Label(shell, SWT.PUSH);
-		network.setText("网络连接已断开！！！");
-		network.setLocation(200, 12);
-		network.setSize(200, 20);
-		network.setFont(new Font(display,"宋体",16,SWT.NORMAL));
-		network.setForeground(new Color(display, 255, 0, 0));
-		network.setVisible(false);
-		
+		ping = new Label(shell, SWT.PUSH);
+		ping.setText("ping: 999ms");
+		ping.setLocation(550, 10);
+		ping.setSize(80, 20);
         
 		/**
 		 * 网址

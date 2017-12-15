@@ -37,7 +37,7 @@ public class AsyncLoadUrlsTask implements Task{
 		Runnable runnable = new Runnable() {
 			@Override
 			public void run() {
-				if(!StatusManage.isNetwork){
+				if(StatusManage.ping==0){
 					return;
 				}
 				//获取需要抓取的url

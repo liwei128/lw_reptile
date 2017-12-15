@@ -16,6 +16,6 @@ public class StatusManage {
 	public static volatile boolean isPause = false;
 		
 	//联网标志
-	public static volatile boolean isNetwork = true;
+	public static volatile int ping = 999;
 	
 }

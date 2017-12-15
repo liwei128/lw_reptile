@@ -35,7 +35,7 @@ public class ImgDownloadTask implements Task{
 		Runnable runnable = new Runnable() {
 			@Override
 			public void run() {
-				if(!StatusManage.isNetwork){
+				if(StatusManage.ping==0){
 					return;
 				}
 				List<MyUrl> imgurls = UrlStorage.getNeedImgs(Config.velocity*20);

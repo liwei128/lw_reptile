@@ -30,24 +30,14 @@ public class MonitorNetworkTask implements Task{
 		Runnable runnable = new Runnable() {
 			@Override
 			public void run() {
-				if(isBrokenNetwork()){
-					if(StatusManage.isNetwork){
-						logger.error("网络连接已断开。。。");
-					}
-					StatusManage.isNetwork=false;
-				}else{
-					if(!StatusManage.isNetwork){
-						logger.info("网络已恢复");
-					}
-					StatusManage.isNetwork=true;
-				}
+				StatusManage.ping = checkNetwork();
 			}
 		};
 		MyThreadPool.scheduleWithFixedDelay(runnable, 500, 500, TimeUnit.MILLISECONDS);
 
 	}
 	
-	private boolean isBrokenNetwork() {
+	private int checkNetwork() {
 		Process p=null;
 		try {
 			p= Runtime.getRuntime().exec("ping www.baidu.com");
@@ -60,10 +50,14 @@ public class MonitorNetworkTask implements Task{
 			}
 			br.close();
 			is.close();
-			return checkRetData(sbf);
+			if(sbf.toString().indexOf("TTL")==-1){
+				return 0;
+			}
+			String ping = sbf.substring(sbf.lastIndexOf("=")+1).trim();
+			return Integer.parseInt(ping.substring(0, ping.indexOf("ms")));
 		} catch (IOException e) {
 			logger.error("网络监控出现异常",e);
-			return true;
+			return 0;
 		}finally {
 			if(p!=null){
 				p.destroy();
@@ -72,14 +66,6 @@ public class MonitorNetworkTask implements Task{
 		}
 	}
 
-	private boolean checkRetData(StringBuffer sbf) {
-		if(sbf.toString().indexOf("TTL")==-1){
-			return true;
-		}
-		String ping = sbf.substring(sbf.lastIndexOf("=")+1);
-		logger.info("ping:"+ping);
-		return false;
-	}
 
 	@Override
 	public void stop() {
