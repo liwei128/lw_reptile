@@ -60,7 +60,7 @@ public class MonitorNetworkTask implements Task{
 			}
 			br.close();
 			is.close();
-			return sbf.toString().indexOf("TTL")==-1;
+			return checkRetData(sbf);
 		} catch (IOException e) {
 			logger.error("网络监控出现异常",e);
 			return true;
@@ -70,6 +70,15 @@ public class MonitorNetworkTask implements Task{
 			}
 			
 		}
+	}
+
+	private boolean checkRetData(StringBuffer sbf) {
+		if(sbf.toString().indexOf("TTL")==-1){
+			return true;
+		}
+		String ping = sbf.substring(sbf.lastIndexOf("=")+1);
+		logger.info("ping:"+ping);
+		return false;
 	}
 
 	@Override
