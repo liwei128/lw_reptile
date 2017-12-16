@@ -40,7 +40,7 @@ public class MonitorNetworkTask implements Task{
 	private int checkNetwork() {
 		Process p=null;
 		try {
-			p= Runtime.getRuntime().exec("ping www.baidu.com");
+			p= Runtime.getRuntime().exec("ping www.baidu.com -n 1");
 			InputStream is = p.getInputStream(); 
 			BufferedReader br = new BufferedReader(new InputStreamReader(is));  
 			StringBuffer sbf = new StringBuffer();  
