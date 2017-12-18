@@ -48,7 +48,7 @@ public class ImgDownloadTask implements Task{
 				asyncDownload(imgurls);
 			}
 		};	
-		future = MyThreadPool.scheduleAtFixedRate(runnable, Config.loadImgTimeInterval, Config.loadImgTimeInterval, TimeUnit.SECONDS);
+		future = MyThreadPool.scheduleAtFixedRate(runnable, 0, Config.loadImgTimeInterval, TimeUnit.SECONDS);
 	}
 	
 	
