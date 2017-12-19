@@ -18,16 +18,6 @@ public class MyUrl{
 	
 	private long startTime=0;//开始爬取的时间
 	
-	private String filePath;//文件保存路径
-	
-
-	public String getFilePath() {
-		return filePath;
-	}
-
-	public void setFilePath(String filePath) {
-		this.filePath = filePath;
-	}
 
 	public long getStartTime() {
 		return startTime;

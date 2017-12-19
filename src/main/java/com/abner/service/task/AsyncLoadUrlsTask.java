@@ -25,7 +25,7 @@ import com.abner.utils.MyThreadPool;
  * @time 2017年11月23日下午1:22:42
  */
 @Service(TaskName.ASYNCLOADURL)
-public class AsyncLoadUrlsTask implements Task{
+public class AsyncLoadUrlsTask extends BaseAsyncTask implements Task{
 	
 	private static  Logger logger=Logger.getLogger(AsyncLoadUrlsTask.class);
 	
@@ -47,9 +47,7 @@ public class AsyncLoadUrlsTask implements Task{
 					return;
 				}
 				StatusManage.urlFinish = false;
-				for(MyUrl reqUrl : urls){
-					asyncLoadUrl(reqUrl);
-				}
+				asyncUrl(urls);
 			}
 		};
 		future = MyThreadPool.scheduleAtFixedRate(runnable, 0, Config.loadUrlTimeInterval, TimeUnit.SECONDS);
@@ -64,40 +62,28 @@ public class AsyncLoadUrlsTask implements Task{
 		}
 	}
 	
-	private void asyncLoadUrl(MyUrl reqUrl) {
-		MyThreadPool.execute(new Runnable() {
-			@Override
-			public void run() {
-				if(!isStart(reqUrl)){
-					return;
-				}
-				logger.info("开始加载网页："+reqUrl.getUrl());
-				String html = LoadUrlUtil.get(reqUrl.getUrl());
-				//若失败，则再请求一次
-				if(html.length()==0){
-					html = LoadUrlUtil.get(reqUrl.getUrl());
-				}
-				if(html.length()==0){
-					MonitorDataStorage.record(MonitorName.FAILURL.name());
-					logger.error("网页加载失败,请求时长:"+reqUrl.loadTime()+"ms,网址:"+reqUrl.getUrl());
-				}else{
-					MonitorDataStorage.record(MonitorName.DONEURL.name());
-					logger.info("网页加载成功,请求时长:"+reqUrl.loadTime()+"ms,网址:"+reqUrl.getUrl());
-					LoadUrlUtil.loadReqUrl(html,new LinkFilter(reqUrl.getUrl()));
-					LoadUrlUtil.loadImageUrl(html,new ImgFilter(reqUrl.getUrl()));
-				}
-				reqUrl.setAlreadyLoad(true);
-			}
-		});
-	}
 	
-	protected synchronized boolean isStart(MyUrl reqUrl) {
-		if(reqUrl.getStartTime()==0){
-			reqUrl.setStartTime(System.currentTimeMillis());
-			return true;
+	@Override
+	public boolean load(MyUrl reqUrl) {
+		int count = 0;
+		while(count<3){
+			count++;
+			String html = LoadUrlUtil.get(reqUrl.getUrl());
+			//若失败，则再请求一次
+			if(html.length()!=0){
+				MonitorDataStorage.record(MonitorName.DONEURL.name());
+				logger.info("网页加载成功,时间:"+reqUrl.loadTime()+"ms,网址:"+reqUrl.getUrl());
+				LoadUrlUtil.loadReqUrl(html,new LinkFilter(reqUrl.getUrl()));
+				LoadUrlUtil.loadImageUrl(html,new ImgFilter(reqUrl.getUrl()));
+				return true;
+			}
 		}
+		MonitorDataStorage.record(MonitorName.FAILURL.name());
+		logger.error("网页加载失败,时间:"+reqUrl.loadTime()+"ms,网址:"+reqUrl.getUrl());
 		return false;
 	}
+
+	
 
 
 }

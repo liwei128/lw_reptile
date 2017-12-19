@@ -13,11 +13,8 @@ import org.apache.http.impl.client.DefaultConnectionKeepAliveStrategy;
 import org.apache.http.impl.client.DefaultRedirectStrategy;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.log4j.Logger;
-
-import com.abner.db.MonitorDataStorage;
-import com.abner.manage.Config;
-import com.abner.enums.MonitorName;
-import com.abner.pojo.MyUrl;
+import com.abner.enums.ReptileRetData;
+import com.abner.pojo.FileDownloadDto;
 /**
  * 文件下载工具类
  * @author wei.li
@@ -28,35 +25,36 @@ public class FileDownloadUtil{
 	
 	private static  Logger logger=Logger.getLogger(FileDownloadUtil.class);
     
-	public static boolean httpClientDownload(MyUrl imgUrl){
+
+	
+	public static ReptileRetData download(FileDownloadDto fileDownloadDto){
 		CloseableHttpClient httpClient=createHttpClient();
     	CloseableHttpResponse response=null;
     	InputStream in = null;
 		FileOutputStream fo = null;
 		try{
-    		HttpGet httpGet = new HttpGet(imgUrl.getUrl());
+    		HttpGet httpGet = new HttpGet(fileDownloadDto.getUrl());
     		httpGet.setHeader("Connection", "keep-alive");
        		httpGet.setHeader("User-Agent", "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Mobile Safari/537.36");
             response = httpClient.execute(httpGet);
             long contentLength = response.getEntity().getContentLength();
-            if(contentLength>=Config.fileSize*1024){
-            	logger.info("开始下载图片,标题:"+imgUrl.getTitle()+",链接:"+imgUrl.getUrl());
-            	String filePath=CommonUtil.getFilePath(imgUrl);
-            	imgUrl.setFilePath(filePath);
+            if(contentLength>=fileDownloadDto.getMinLimit()*1024){
+            	String filePath = fileDownloadDto.getFilePath();
+            	CommonUtil.checkPath(filePath);
             	in=response.getEntity().getContent();
-            	fo = new FileOutputStream(new File(filePath));  
+            	fo = new FileOutputStream(new File(filePath+"/"+fileDownloadDto.getFileName()));  
                 byte[] buf = new byte[1024];  
                 int length = 0;  
                 while ((length = in.read(buf, 0, buf.length)) != -1) {  
                     fo.write(buf, 0, length);  
                 }
-                MonitorDataStorage.record(MonitorName.DONEIMG.name());
-                logger.info("图片下载成功,下载时长:"+imgUrl.loadTime()+"ms,保存路径:"+filePath+",链接:"+imgUrl.getUrl());
+                return ReptileRetData.SUCCESS;
+            }else{
+            	return ReptileRetData.OVER_LIMIT;
             }
-            return true;
 		}catch(Exception e){
-			logger.error("链接:"+imgUrl.getUrl(),e);
-			return false;
+			logger.error("链接:"+fileDownloadDto.getUrl(),e);
+			return ReptileRetData.FAIL;
     	}finally{
     		CommonUtil.closeStream(fo,in,response,httpClient);
     	}

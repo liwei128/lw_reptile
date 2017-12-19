@@ -14,13 +14,9 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.math.BigDecimal;
-import java.util.UUID;
 
 import org.apache.log4j.Logger;
 
-import com.abner.manage.Config;
-import com.abner.manage.FilePathManage;
-import com.abner.pojo.MyUrl;
 /**
  * 公共工具类
  * @author wei.li
@@ -30,25 +26,6 @@ public class CommonUtil {
 	
 	private static  Logger logger=Logger.getLogger(CommonUtil.class);
 	
-	/**
-	 * 通过url来设置文件目录名
-	 * 
-	 */
-	public static  String getFilePath(MyUrl imgUrl) {
-		String url = imgUrl.getUrl();
-		String title = imgUrl.getTitle();
-		//文件名设置
-		String suffix = url.substring(url.lastIndexOf("."));
-		String fileName = UUID.randomUUID().toString()+suffix;
-		//检查目录是否存在
-		File file = new File(Config.filePath+title);
-	    if(!file.exists()){
-	    	file.mkdirs();
-	    }
-        //完整文件名
-		String path=Config.filePath+title+"/"+fileName;
-        return path;
-	}
 	
 	/**
 	 * 
@@ -162,8 +139,8 @@ public class CommonUtil {
 	 * 检测目录是否存在，如果不存在则创建
 	 * 
 	 */
-	public static void checkPath(String configPath) {
-		File file = new File(FilePathManage.configPath);
+	public static void checkPath(String path) {
+		File file = new File(path);
 		if(!file.exists()){
 			file.mkdirs();
 		}	

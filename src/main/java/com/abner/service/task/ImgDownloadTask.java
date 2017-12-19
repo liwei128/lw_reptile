@@ -12,6 +12,8 @@ import com.abner.db.UrlStorage;
 import com.abner.manage.Config;
 import com.abner.manage.StatusManage;
 import com.abner.enums.MonitorName;
+import com.abner.enums.ReptileRetData;
+import com.abner.pojo.FileDownloadDto;
 import com.abner.pojo.MyUrl;
 import com.abner.enums.TaskName;
 import com.abner.utils.CommonUtil;
@@ -23,7 +25,7 @@ import com.abner.utils.MyThreadPool;
  * @time 2017年11月23日下午1:23:39
  */
 @Service(TaskName.IMGDOWNLOAD)
-public class ImgDownloadTask implements Task{
+public class ImgDownloadTask extends BaseAsyncTask implements Task{
 	
 	private static  Logger logger=Logger.getLogger(ImgDownloadTask.class);
 	
@@ -45,54 +47,12 @@ public class ImgDownloadTask implements Task{
 					return;
 				}
 				StatusManage.imgFinish = false;
-				asyncDownload(imgurls);
+				asyncUrl(imgurls);
 			}
 		};	
 		future = MyThreadPool.scheduleAtFixedRate(runnable, 0, Config.loadImgTimeInterval, TimeUnit.SECONDS);
 	}
 	
-	
-	
-	
-	/**
-	 * 异步下载图片
-	 * 
-	 */
-	public void asyncDownload(List<MyUrl> imgUrls) {
-		for(int i=0;i<imgUrls.size();i++){
-			MyUrl imgUrl = imgUrls.get(i);
-			MyThreadPool.execute(new Runnable() {
-				@Override
-				public void run() {
-					if(isStart(imgUrl)){
-						boolean isSuccess = FileDownloadUtil.httpClientDownload(imgUrl);
-						if(!isSuccess){
-							CommonUtil.deleteFile(imgUrl.getFilePath());
-							isSuccess=FileDownloadUtil.httpClientDownload(imgUrl);
-						}
-						if(!isSuccess){
-							CommonUtil.deleteFile(imgUrl.getFilePath());
-							MonitorDataStorage.record(MonitorName.FAILIMG.name());
-							logger.error("图片下载失败,下载时长:"+imgUrl.loadTime()+"ms,标题:"+imgUrl.getTitle()+",链接:"+imgUrl.getUrl());
-						}
-				        imgUrl.setAlreadyLoad(true);
-					}
-				}
-			});
-			
-		}
-		imgUrls.clear();
-	}
-	
-	protected synchronized boolean isStart(MyUrl imgUrl) {
-		if(imgUrl.getStartTime()==0){
-			imgUrl.setStartTime(System.currentTimeMillis());
-			return true;
-		}
-		return false;
-	}
-
-
 
 
 	@Override
@@ -101,6 +61,32 @@ public class ImgDownloadTask implements Task{
 			future.cancel(false);
 			logger.info(TaskName.IMGDOWNLOAD.getDesc()+" 任务停止");
 		}
+	}
+
+
+
+
+	@Override
+	public boolean load(MyUrl imgUrl) {
+		FileDownloadDto fileDownloadDto = new FileDownloadDto(imgUrl);
+		int count = 0;
+		while(count<3){
+			count++;
+			ReptileRetData retData = FileDownloadUtil.download(fileDownloadDto);
+			if(ReptileRetData.SUCCESS == retData){
+				logger.info("图片下载成功,时间："+(System.currentTimeMillis()-imgUrl.getStartTime())+"ms ,保存路径："+fileDownloadDto.getFilePath());
+				MonitorDataStorage.record(MonitorName.DONEIMG.name());
+				return true;
+			}
+			if(ReptileRetData.OVER_LIMIT == retData){
+				logger.info("图片链接:"+imgUrl.getUrl()+",图片大小不满足最小限制"+fileDownloadDto.getMinLimit()+"kb");
+				return false;
+			}
+		}
+		logger.error("图片下载失败,时间:"+(System.currentTimeMillis()-imgUrl.getStartTime())+"ms,网址:"+imgUrl.getUrl());
+		CommonUtil.deleteFile(fileDownloadDto.getFilePath()+"/"+fileDownloadDto.getFileName());
+		MonitorDataStorage.record(MonitorName.FAILIMG.name());
+		return false;
 	}
 
 }
