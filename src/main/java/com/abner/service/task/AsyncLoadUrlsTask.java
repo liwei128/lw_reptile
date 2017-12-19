@@ -73,8 +73,10 @@ public class AsyncLoadUrlsTask extends BaseAsyncTask implements Task{
 			if(html.length()!=0){
 				MonitorDataStorage.record(MonitorName.DONEURL.name());
 				logger.info("网页加载成功,时间:"+reqUrl.loadTime()+"ms,网址:"+reqUrl.getUrl());
-				LoadUrlUtil.loadReqUrl(html,new LinkFilter(reqUrl.getUrl()));
-				LoadUrlUtil.loadImageUrl(html,new ImgFilter(reqUrl.getUrl()));
+				int reqNum = LoadUrlUtil.loadReqUrl(html,new LinkFilter(reqUrl.getUrl()));
+				MonitorDataStorage.record(MonitorName.SUMIMG.name(),reqNum);
+				int imageNum = LoadUrlUtil.loadImageUrl(html,new ImgFilter(reqUrl.getUrl()));
+				MonitorDataStorage.record(MonitorName.SUMURL.name(),imageNum);
 				return true;
 			}
 		}
