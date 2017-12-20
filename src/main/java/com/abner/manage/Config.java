@@ -23,18 +23,6 @@ public class Config {
 	//清理超时的Phantomjs进程
 	public static int cleanPhantomjsTime = 100;
 	
-	//清理任务扫描时间间隔
-	public static int cleanPhantomjsTaskInterval = 30;
-	
-	//定时扫描并下载图片的时间间隔
-	public static int loadImgTimeInterval = 5;
-	
-	//定时抓取图片的时间间隔
-	public static int loadUrlTimeInterval = 5;
-	
-	//定时发送监控邮件
-	public static int sendMailInterval = 60*60;
-	
 	//接收邮件地址
 	public static String emailAddress;
 	

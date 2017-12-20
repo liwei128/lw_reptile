@@ -12,5 +12,5 @@ import java.lang.annotation.*;
 @Inherited
 public @interface Service {
 	
-	String name() default "";//服务名
+	String value() default "";//服务名
 }
