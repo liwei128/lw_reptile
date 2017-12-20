@@ -19,7 +19,7 @@ import com.abner.utils.JsonUtil;
  * @author LW
  * @time 2017年12月20日 下午7:45:08
  */
-@Service
+@Service()
 public class CommonService {
 	
 	private static  Logger logger=Logger.getLogger(CommonService.class);

@@ -39,12 +39,9 @@ public class ServiceFactory {
 		for(Class<?> clazz:taskClasss){
 			try {
 				//生成代理对象
-				Enhancer enhancer=new Enhancer();  
-				enhancer.setSuperclass(clazz);  
-				enhancer.setCallback(new TaskInterceptor(clazz));  
-				Object object = enhancer.create();  
+				Object instance = createInstance(clazz); 
 				//装入Map
-				newHashMap.put(clazz.getName(), object);
+				newHashMap.put(clazz.getName(), instance);
 			} catch (Exception e) {
 				logger.error("服务初始化失败, ",e);
 			}
@@ -60,7 +57,8 @@ public class ServiceFactory {
 		Set<Class<?>> taskClasss = reflections.getTypesAnnotatedWith(Controller.class);
 		for(Class<?> clazz:taskClasss){
 			try {
-				Object instance = clazz.newInstance();
+				//生成代理对象 
+				Object instance = createInstance(clazz); 
 				//赋值
 				Field[] fields = clazz.getDeclaredFields();
 				for(Field field :fields){
@@ -79,6 +77,14 @@ public class ServiceFactory {
 		}
 		
 		return newHashMap;
+	}
+
+
+	private static Object createInstance(Class<?> clazz) {
+		Enhancer enhancer=new Enhancer();  
+		enhancer.setSuperclass(clazz);  
+		enhancer.setCallback(new TaskInterceptor(clazz));  
+		return enhancer.create();  
 	}
 
 

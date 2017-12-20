@@ -8,6 +8,7 @@ import org.jsoup.nodes.Document;
 
 import com.abner.annotation.Controller;
 import com.abner.annotation.Resource;
+import com.abner.annotation.Singleton;
 import com.abner.db.LogStorage;
 import com.abner.db.MonitorDataStorage;
 import com.abner.db.UrlStorage;
@@ -46,7 +47,7 @@ public class ReptileController {
 	@Resource
 	private MonitorNetworkService monitorNetworkService;
 	
-	
+	@Singleton
 	public void init() {
 		//初始化Jsoup，因为线程中断的情况下无法完成初始化
 		Document doc = Jsoup.parse("");
