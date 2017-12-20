@@ -21,6 +21,7 @@ import org.eclipse.swt.widgets.Text;
 import com.abner.controller.ReptileController;
 import com.abner.enums.MonitorName;
 import com.abner.manage.Config;
+import com.abner.manage.ServiceFactory;
 import com.abner.manage.StatusManage;
 import com.abner.pojo.UserSetting;
 import com.abner.utils.CommonUtil;
@@ -32,7 +33,7 @@ import com.abner.utils.CommonUtil;
 public abstract class AbstractReptileFunction {
 	
 	//爬虫主服务
-	private static ReptileController reptileController = new ReptileController();
+	private static ReptileController reptileController = ServiceFactory.getController(ReptileController.class);
 	
 	/**
 	 * 窗体控件
