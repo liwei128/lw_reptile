@@ -39,6 +39,7 @@ public class LoadUrlsService extends BaseAsyncService{
 		}
 		//获取需要抓取的url
 		List<MyUrl> urls = UrlStorage.getNeedUrls(Config.velocity*2);
+		logger.info("网页加载队列："+urls.size());
 		if(urls.size()==0){
 			StatusManage.urlFinish = true;
 			return;
