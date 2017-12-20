@@ -14,7 +14,11 @@ import com.abner.pojo.MyUrl;
 import com.abner.pojo.UserSetting;
 import com.abner.utils.CommonUtil;
 import com.abner.utils.JsonUtil;
-
+/**
+ * 爬虫基础服务
+ * @author LW
+ * @time 2017年12月20日 下午7:45:08
+ */
 @Service
 public class CommonService {
 	
