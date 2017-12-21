@@ -88,4 +88,5 @@ public class CommonService {
 		CommonUtil.checkPath(FilePathManage.configPath);
 		CommonUtil.writeToFile(JsonUtil.toString(Config.userSetting), FilePathManage.userSetting);
 	}
+
 }

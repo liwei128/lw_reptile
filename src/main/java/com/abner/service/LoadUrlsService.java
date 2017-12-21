@@ -30,8 +30,7 @@ import com.abner.utils.LoadUrlUtil;
 public class LoadUrlsService extends BaseAsyncService{
 	
 	private static  Logger logger=Logger.getLogger(LoadUrlsService.class);
-
-
+	
 	@Timing(initialDelay = 0, period = 5, type = TimingType.FIXED_RATE, unit = TimeUnit.SECONDS)
 	public void loadUrl() {
 		if(StatusManage.ping==0){

@@ -30,7 +30,6 @@ public class LoadImgService extends BaseAsyncService{
 	
 	private static  Logger logger=Logger.getLogger(LoadImgService.class);
 	
-	
 	@Timing(initialDelay = 0, period = 5, type = TimingType.FIXED_RATE, unit = TimeUnit.SECONDS)
 	public void loadImg() {
 		if(StatusManage.ping==0){
@@ -76,7 +75,7 @@ public class LoadImgService extends BaseAsyncService{
 				return true;
 			}
 			if(ReptileRetData.OVER_LIMIT == retData){
-				logger.info("图片链接:"+imgUrl.getUrl()+",图片大小不满足最小限制"+fileDownloadDto.getMinLimit()+"kb");
+				logger.info("图片:"+imgUrl.getUrl()+",小于"+fileDownloadDto.getMinLimit()+"kb");
 				imgUrl.setAlreadyLoad(true);
 				return false;
 			}
@@ -87,5 +86,7 @@ public class LoadImgService extends BaseAsyncService{
 		imgUrl.setAlreadyLoad(true);
 		return false;
 	}
+
+
 
 }

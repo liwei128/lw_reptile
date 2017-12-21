@@ -33,7 +33,7 @@ import com.abner.utils.CommonUtil;
 public abstract class AbstractReptileFunction {
 	
 	//爬虫主服务
-	private static ReptileController reptileController = ServiceFactory.getController(ReptileController.class);
+	private static ReptileController reptileController = ServiceFactory.getService(ReptileController.class);
 	
 	/**
 	 * 窗体控件

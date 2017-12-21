@@ -99,5 +99,4 @@ public class ReptileController {
 		return MonitorDataStorage.getAllMonitorData(timeMinutes);
 	}
 	
-	
 }

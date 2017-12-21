@@ -15,6 +15,7 @@ import com.google.common.collect.Maps;
 import net.sf.cglib.proxy.Enhancer;
 /**
  * 任务工厂
+ * 可实现依赖注入
  * @author LW
  *
  */
@@ -22,75 +23,61 @@ public class ServiceFactory {
 	
 	private static  Logger logger = Logger.getLogger(ServiceFactory.class);
 	
-	private static String servicePackage = "com.abner.service";
+	private static String packageName = "com.abner";
 	
-	private static String controllerPackage = "com.abner.controller";
-	
-	private static Map<String ,Object> serviceMap = initService();
-	
-	private static Map<String ,Object> controllerMap = initController();
-	
-	
+	private static Map<String ,Object> serviceMap;
 
-	private static Map<String ,Object> initService() {
-		Map<String ,Object> newHashMap = Maps.newHashMap();
-		Reflections reflections = new Reflections(servicePackage);
-		Set<Class<?>> taskClasss = reflections.getTypesAnnotatedWith(Service.class);
-		for(Class<?> clazz:taskClasss){
-			try {
-				//生成代理对象
-				Object instance = createInstance(clazz); 
-				//装入Map
-				newHashMap.put(clazz.getName(), instance);
-			} catch (Exception e) {
-				logger.error("服务初始化失败, ",e);
-			}
-			
+	private static void initService() {
+		serviceMap = Maps.newHashMap();
+		Reflections reflections = new Reflections(packageName);
+		Set<Class<?>> serviceClasss = reflections.getTypesAnnotatedWith(Service.class);
+		Set<Class<?>> controllerClasss = reflections.getTypesAnnotatedWith(Controller.class);
+		serviceClasss.addAll(controllerClasss);
+		for(Class<?> clazz:serviceClasss){
+			createInstance(clazz); 
 		}
-		return newHashMap;
 	}
 
 
-	private static Map<String, Object> initController() {
-		Map<String ,Object> newHashMap = Maps.newHashMap();
-		Reflections reflections = new Reflections(controllerPackage);
-		Set<Class<?>> taskClasss = reflections.getTypesAnnotatedWith(Controller.class);
-		for(Class<?> clazz:taskClasss){
-			try {
-				//生成代理对象 
-				Object instance = createInstance(clazz); 
-				//赋值
-				Field[] fields = clazz.getDeclaredFields();
-				for(Field field :fields){
-					if(field.getAnnotation(Resource.class) != null){
-						field.setAccessible(true);
-						Object object = serviceMap.get(field.getType().getName());
-						field.set(instance, object);
+	private static void createInstance(Class<?> clazz) {
+		if(clazz.getAnnotation(Service.class)==null&&clazz.getAnnotation(Controller.class)==null){
+			return ;
+		}
+		if(serviceMap.get(clazz.getName())!=null){
+			return ;
+		}
+		try{
+			Enhancer enhancer=new Enhancer();  
+			enhancer.setSuperclass(clazz);  
+			enhancer.setCallback(new TaskInterceptor(clazz));  
+			Object create = enhancer.create();
+			Field[] fields = clazz.getDeclaredFields();
+			for(Field field :fields){
+				if(field.getAnnotation(Resource.class) != null){
+					field.setAccessible(true);
+					if(serviceMap.get(field.getType().getName())==null){
+						createInstance(field.getType());
 					}
+					Object object = serviceMap.get(field.getType().getName());
+					field.set(create, object);
 				}
-				//装入Map
-				newHashMap.put(clazz.getName(), instance);
-			} catch (Exception e) {
-				logger.error("服务初始化失败, ",e);
 			}
-			
+			serviceMap.put(clazz.getName(), create);
+			logger.info(clazz.getName()+" 创建成功");
+		}catch(Exception e){
+			logger.error(clazz.getName()+" 创建失败",e);
 		}
-		
-		return newHashMap;
-	}
-
-
-	private static Object createInstance(Class<?> clazz) {
-		Enhancer enhancer=new Enhancer();  
-		enhancer.setSuperclass(clazz);  
-		enhancer.setCallback(new TaskInterceptor(clazz));  
-		return enhancer.create();  
 	}
 
 
 	@SuppressWarnings("unchecked")
-	public static <T> T getController(Class<T> clazz) {
-		return (T) controllerMap.get(clazz.getName());
+	public static <T> T getService(Class<T> clazz) {
+		synchronized (packageName) {
+			if(serviceMap == null){
+				initService();
+			}
+		}
+		return (T) serviceMap.get(clazz.getName());
 	}
 	
 	
