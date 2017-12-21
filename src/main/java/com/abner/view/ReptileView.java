@@ -1,8 +1,6 @@
 package com.abner.view;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Display;
@@ -18,6 +16,7 @@ public class ReptileView extends AbstractReptileFunction{
 	
 	private Display display;
 	private Shell shell;
+	private Label ping;
 	private Label urls;
 	private Text urlsText;
 	private Label filePath;
@@ -25,7 +24,6 @@ public class ReptileView extends AbstractReptileFunction{
 	private Text filePathText;
 	private Label fileSize;
 	private Text fileSizeText;
-	private Label network;
 	private Combo combo;
 	private Label comboLable;
 	private Label sumUrl;
@@ -57,7 +55,10 @@ public class ReptileView extends AbstractReptileFunction{
 	private Label isNowDomainLable;
 	
 	
-	
+	@Override
+	public Label getPing() {
+		return ping;
+	}
 	@Override
 	public Text getEmailAddressText() {
 		return emailAddressText;
@@ -86,10 +87,6 @@ public class ReptileView extends AbstractReptileFunction{
 	@Override
 	public Text getFileSizeText() {
 		return fileSizeText;
-	}
-	@Override
-	public Label getNetwork() {
-		return network;
 	}
 	@Override
 	public Button getHideButton() {
@@ -166,18 +163,13 @@ public class ReptileView extends AbstractReptileFunction{
 		shell.setText("图片爬虫");
 		shell.setSize(650, 375);
 		
-		
 		/**
-		 * 断网提示
+		 * ping值
 		 */
-		network = new Label(shell, SWT.PUSH);
-		network.setText("网络连接已断开！！！");
-		network.setLocation(200, 12);
-		network.setSize(200, 20);
-		network.setFont(new Font(display,"宋体",16,SWT.NORMAL));
-		network.setForeground(new Color(display, 255, 0, 0));
-		network.setVisible(false);
-		
+		ping = new Label(shell, SWT.PUSH);
+		ping.setText("ping: 999ms");
+		ping.setLocation(550, 10);
+		ping.setSize(80, 20);
         
 		/**
 		 * 网址
@@ -240,20 +232,12 @@ public class ReptileView extends AbstractReptileFunction{
         velocity.add("3");
         velocity.add("4");
         velocity.add("5");
-        velocity.add("6");
-        velocity.add("7");
-        velocity.add("8");
-        velocity.add("9");
         velocity.setData("0", 1);
         velocity.setData("1", 2);
         velocity.setData("2", 3);
         velocity.setData("3", 4);
         velocity.setData("4", 5);
-        velocity.setData("5", 6);
-        velocity.setData("6", 7);
-        velocity.setData("7", 8);
-        velocity.setData("8", 9);
-        velocity.select(1);
+        velocity.select(0);
         velocity.setLocation(80,190);
         velocity.setSize(100, 20);
         

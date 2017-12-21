@@ -21,6 +21,7 @@ import org.eclipse.swt.widgets.Text;
 import com.abner.controller.ReptileController;
 import com.abner.enums.MonitorName;
 import com.abner.manage.Config;
+import com.abner.manage.ServiceFactory;
 import com.abner.manage.StatusManage;
 import com.abner.pojo.UserSetting;
 import com.abner.utils.CommonUtil;
@@ -32,18 +33,18 @@ import com.abner.utils.CommonUtil;
 public abstract class AbstractReptileFunction {
 	
 	//爬虫主服务
-	private static ReptileController reptileController = new ReptileController();
+	private static ReptileController reptileController = ServiceFactory.getService(ReptileController.class);
 	
 	/**
 	 * 窗体控件
 	 */
 	public abstract Display getDisplay();
 	public abstract Shell getShell();
+	public abstract Label getPing();
 	public abstract Text getUrlsText();
 	public abstract Button getFilePathButton();
 	public abstract Text getFilePathText();
 	public abstract Text getFileSizeText();
-	public abstract Label getNetwork();
 	public abstract Button getHideButton();
 	public abstract Button getStartButton();
 	public abstract Button getPauseButton();
@@ -67,7 +68,7 @@ public abstract class AbstractReptileFunction {
 		return new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
-				if(!StatusManage.isNetwork){
+				if(StatusManage.ping==0){
 					sendErrMsg("网络连接已断开");
 					return;
 				}
@@ -257,10 +258,10 @@ public abstract class AbstractReptileFunction {
 	}
 	//网络异常提示
 	private void networkMsg() {
-		if(StatusManage.isNetwork){
-			getNetwork().setVisible(false);
+		if(StatusManage.ping == 0){
+			getPing().setText("网络异常");
 		}else{
-			getNetwork().setVisible(true);
+			getPing().setText("ping: "+StatusManage.ping+"ms");
 		}
 	}
 	//日志输出

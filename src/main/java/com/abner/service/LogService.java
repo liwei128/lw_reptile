@@ -1,4 +1,4 @@
-package com.abner.service.task;
+package com.abner.service;
 
 import java.io.IOException;
 import java.io.PipedReader;
@@ -14,20 +14,18 @@ import com.abner.annotation.Async;
 import com.abner.annotation.Service;
 import com.abner.annotation.Singleton;
 import com.abner.db.LogStorage;
-import com.abner.enums.TaskName;
 /**
  * 日志服务
  * @author wei.li
  * @time 2017年11月23日下午1:26:22
  */
-@Service(name = TaskName.LOG)
-public class LogTask implements Task{
+@Service
+public class LogService{
 	
 	@SuppressWarnings("resource")
-	@Override
 	@Async
 	@Singleton
-	public void execute() {
+	public void readLogs() {
 		PipedReader reader = interceptLog();
 		while(true){
 			Scanner scanner = new Scanner(reader);
@@ -57,10 +55,6 @@ public class LogTask implements Task{
 		
 	}
 
-	@Override
-	public void stop() {
-		
-	}
 	
 	
 }

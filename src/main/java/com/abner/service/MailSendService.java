@@ -1,59 +1,42 @@
-package com.abner.service.task;
+package com.abner.service;
 
 import java.util.Map;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-
-import org.apache.log4j.Logger;
 
 import com.abner.annotation.Async;
 import com.abner.annotation.Service;
+import com.abner.annotation.Stop;
+import com.abner.annotation.Timing;
 import com.abner.db.MonitorDataStorage;
 import com.abner.manage.Config;
 import com.abner.enums.MonitorName;
-import com.abner.enums.TaskName;
+import com.abner.enums.TimingType;
 import com.abner.utils.CommonUtil;
 import com.abner.utils.EmailSendUtils;
-import com.abner.utils.MyThreadPool;
 /**
  * 邮件发送服务
  * @author wei.li
  * @time 2017年11月23日下午1:26:41
  */
-@Service(name = TaskName.MAILSEND)
-public class MailSendTask implements Task{
+@Service
+public class MailSendService{
 	
-	private static  Logger logger=Logger.getLogger(MailSendTask.class);
-	
-	private ScheduledFuture<?> future;
 
-	@Override
-	public void execute() {
-		logger.info(TaskName.MAILSEND.getDesc()+" 任务启动。。。");
-		Runnable runnable = new Runnable() {
-			@Override
-			public void run() {
-				if(Config.emailAddress==null){
-					return;
-				}
-				Map<String, Long> allMonitorData = MonitorDataStorage.getAllMonitorData();
-				String head = builderRunHead();
-				String body=builderBody(allMonitorData);
-				EmailSendUtils.sendMail(Config.emailAddress, head+body);
-			}
-		};
-		future = MyThreadPool.scheduleAtFixedRate(runnable, Config.sendMailInterval, Config.sendMailInterval, TimeUnit.SECONDS);
-	}
-
-	
-	@Override
-	@Async
-	public void stop() {
-		if(future==null){
+	@Timing(initialDelay = 60, period = 60, type = TimingType.FIXED_RATE, unit = TimeUnit.MINUTES)
+	public void sendMail() {
+		if(Config.emailAddress==null){
 			return;
 		}
-		future.cancel(false);
-		logger.info(TaskName.MAILSEND.getDesc()+" 任务停止");
+		Map<String, Long> allMonitorData = MonitorDataStorage.getAllMonitorData();
+		String head = builderRunHead();
+		String body=builderBody(allMonitorData);
+		EmailSendUtils.sendMail(Config.emailAddress, head+body);
+		
+	}
+
+	@Stop(methods = { "sendMail" })
+	@Async
+	public void stopSendMail() {
 		if(Config.emailAddress==null){
 			return;
 		}

@@ -18,28 +18,16 @@ public class Config {
 	public static final List<String> URLS = Lists.newArrayList();
 	
 	//爬虫速度
-	public static Integer velocity = 1;
+	public static int velocity = 1;
 	
 	//清理超时的Phantomjs进程
-	public static Integer cleanPhantomjsTime = 100;
-	
-	//清理任务扫描时间间隔
-	public static Integer cleanPhantomjsTaskInterval = 30;
-	
-	//定时扫描并下载图片的时间间隔
-	public static Integer loadImgTimeInterval = 5;
-	
-	//定时抓取图片的时间间隔
-	public static Integer loadUrlTimeInterval = 5;
-	
-	//定时发送监控邮件
-	public static Integer sendMailInterval = 60*60;
+	public static int cleanPhantomjsTime = 100;
 	
 	//接收邮件地址
 	public static String emailAddress;
 	
 	//文件大小限制（kb）
-	public static Integer fileSize = 0;
+	public static int fileSize = 0;
 	
 	//文件保存路径
 	public static String filePath = "E:\\图片\\爬虫\\";

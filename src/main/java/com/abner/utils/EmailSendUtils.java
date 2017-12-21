@@ -7,6 +7,7 @@ import javax.mail.internet.MimeMessage;
 
 import org.apache.log4j.Logger;
 
+import com.abner.manage.Config;
 
 import java.util.Date;
 import java.util.Properties;
@@ -31,10 +32,9 @@ public class EmailSendUtils {
             transport.connect("18576462480@163.com", "lw0116");
             // 发送邮件
             transport.sendMessage(message, message.getAllRecipients());
-
             //关闭连接
             transport.close();
-            logger.info("邮件成功发送到:"+address);
+            logger.info("邮件成功发送到:"+Config.emailAddress);
             return true;
     	}catch(Exception e){
     		logger.error("邮件发送失败",e);

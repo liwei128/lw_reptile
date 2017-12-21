@@ -3,44 +3,71 @@ package com.abner.controller;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 
+import com.abner.annotation.Controller;
+import com.abner.annotation.Resource;
+import com.abner.annotation.Singleton;
 import com.abner.db.LogStorage;
 import com.abner.db.MonitorDataStorage;
 import com.abner.db.UrlStorage;
 import com.abner.manage.Config;
-import com.abner.enums.TaskName;
-import com.abner.service.ReptileService;
+import com.abner.service.CommonService;
+import com.abner.service.LoadImgService;
+import com.abner.service.LoadUrlsService;
+import com.abner.service.LogService;
+import com.abner.service.MailSendService;
+import com.abner.service.MonitorNetworkService;
 /**
  * 爬虫控制服务
  * @author wei.li
  * @time 2017年6月19日下午3:02:21
  */
+@Controller
 public class ReptileController {
 	
 	private static  Logger logger=Logger.getLogger(ReptileController.class);
 	
-	private static ReptileService reptileService = new ReptileService();
+	@Resource
+	private CommonService commonService;
 	
+	@Resource
+	private LoadUrlsService loadUrlsService;
 	
+	@Resource
+	private LoadImgService loadImgService;
+	
+	@Resource
+	private LogService logService;
+	
+	@Resource
+	private MailSendService mailSendService;
+	
+	@Resource
+	private MonitorNetworkService monitorNetworkService;
+	
+	@Singleton
 	public void init() {
-		//初始化Jsoup，因为线程中断的情况下无法完成初始化
-		Document doc = Jsoup.parse("");
-		logger.info("Jsoup初始化完成。\n"+doc);
-		//开启服务线程
-		reptileService.run(TaskName.INIT);
+		logService.readLogs();
+		monitorNetworkService.monitorNetwork();
+		commonService.readUrlFile();
+		commonService.readUserSetting();
+		commonService.restoreLink();
 	}
 	public void start(){
 		//加载用户输入的网址
 		UrlStorage.addUrlStr(Config.URLS);
 		//开启服务线程
-		reptileService.run(TaskName.RUN);
+		loadUrlsService.loadUrl();
+		loadUrlsService.cleanPhantomjs();
+		loadImgService.loadImg();
+		mailSendService.sendMail();
 	}
 	
 	public void end(){
 		//停止服务
-		reptileService.run(TaskName.STOP);
+		loadUrlsService.stopLoadUrl();
+		loadImgService.stopLoadImg();
+		mailSendService.stopSendMail();
 	}
 
 	
@@ -56,21 +83,20 @@ public class ReptileController {
 	
 	//保存网址到文件
 	public void saveAddress(){
-		reptileService.run(TaskName.SAVEADDRESS);
+		commonService.saveUrlFile();
 	}
 	
 	//保存用户配置到文件
 	public void saveUserSetting() {
-		reptileService.run(TaskName.SAVEUSERSETTING);
+		commonService.saveUserSetting();
 	}
 	//清除缓存
 	public void cleanCache() {
-		reptileService.run(TaskName.CLEANCACHE);
+		commonService.cleanCache();
 	}
 	//获取监控信息
 	public Map<String,Long> getAllMonitorData(int timeMinutes) {
 		return MonitorDataStorage.getAllMonitorData(timeMinutes);
 	}
-	
 	
 }

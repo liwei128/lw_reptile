@@ -11,13 +11,10 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-
-import com.abner.db.MonitorDataStorage;
 import com.abner.db.PhantomjsStorage;
 import com.abner.db.UrlStorage;
 import com.abner.filter.BaseUrlFilter;
 import com.abner.manage.FilePathManage;
-import com.abner.enums.MonitorName;
 import com.abner.pojo.MyUrl;
 import com.google.common.collect.Lists;
 /**
@@ -63,7 +60,7 @@ public class LoadUrlUtil{
 			
 	}
 		
-	public static void loadImageUrl(String html,BaseUrlFilter baseUrlFilter) {  
+	public static int loadImageUrl(String html,BaseUrlFilter baseUrlFilter) {  
 		Document doc = Jsoup.parse(html);
 		String title = doc.head().select("title").text();
 		title=checkTitle(title.trim());
@@ -76,10 +73,10 @@ public class LoadUrlUtil{
 				if(add){ num++;};
 			}
 		}
-		MonitorDataStorage.record(MonitorName.SUMIMG.name(),num);
+		return num;
 	}
 		       	 
-	public static void loadReqUrl(String html,BaseUrlFilter baseUrlFilter) {
+	public static int loadReqUrl(String html,BaseUrlFilter baseUrlFilter) {
 		Document doc = Jsoup.parse(html);
 		Elements as = doc.select("a[href]");
 		Elements frames = doc.select("frame[src]");
@@ -107,7 +104,7 @@ public class LoadUrlUtil{
 			   if(add) {num++;};
 		   }
 		} 
-		MonitorDataStorage.record(MonitorName.SUMURL.name(),num);
+		return num;
 	}
 
 		

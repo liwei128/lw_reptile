@@ -1,9 +1,6 @@
 package com.abner.annotation;
 
-
 import java.lang.annotation.*;
-
-import com.abner.enums.TaskName;
 
 /**
  * 服务名注解
@@ -15,5 +12,5 @@ import com.abner.enums.TaskName;
 @Inherited
 public @interface Service {
 	
-	TaskName name();//服务名
+	String value() default "";//服务名
 }
