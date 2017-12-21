@@ -3,8 +3,6 @@ package com.abner.controller;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 
 import com.abner.annotation.Controller;
 import com.abner.annotation.Resource;
@@ -49,10 +47,6 @@ public class ReptileController {
 	
 	@Singleton
 	public void init() {
-		//初始化Jsoup，因为线程中断的情况下无法完成初始化
-		Document doc = Jsoup.parse("");
-		logger.info("Jsoup初始化完成。\n"+doc);
-		
 		logService.readLogs();
 		monitorNetworkService.monitorNetwork();
 		commonService.readUrlFile();
