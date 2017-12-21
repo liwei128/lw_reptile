@@ -15,7 +15,11 @@ import com.abner.filter.ImgFilter;
 import com.abner.filter.LinkFilter;
 import com.abner.pojo.MyUrl;
 import com.google.common.collect.Lists;
-
+/**
+ * 网页解析服务
+ * @author wei.li
+ * @time 2017年12月21日下午5:19:42
+ */
 @Service
 public class ParseHtmlService {
 	
