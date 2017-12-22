@@ -111,7 +111,7 @@ public class CommonService {
 		FileUtil.writeToFile(reqUrls, FilePathManage.reqUrls);
 		String imgUrls = JsonUtil.toString(UrlStorage.getImgs());
 		FileUtil.writeToFile(imgUrls, FilePathManage.imgUrls);
-		logger.info("地址保存，耗时:{}",System.currentTimeMillis()-startTime);
+		logger.info("地址保存，耗时:{}ms",System.currentTimeMillis()-startTime);
 	}
 	/**
 	 * 保存用户配置
