@@ -105,11 +105,13 @@ public class CommonService {
 	 * void
 	 */
 	public void saveUrlFile() {
+		long startTime = System.currentTimeMillis();
 		verifyService.checkPath(FilePathManage.configPath);
 		String reqUrls = JsonUtil.toString(UrlStorage.getUrls());
 		FileUtil.writeToFile(reqUrls, FilePathManage.reqUrls);
 		String imgUrls = JsonUtil.toString(UrlStorage.getImgs());
 		FileUtil.writeToFile(imgUrls, FilePathManage.imgUrls);
+		logger.info("地址保存，耗时:{}",System.currentTimeMillis()-startTime);
 	}
 	/**
 	 * 保存用户配置
