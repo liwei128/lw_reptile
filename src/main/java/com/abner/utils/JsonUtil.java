@@ -30,6 +30,9 @@ public class JsonUtil {
     }
 
     public static <T> T toBean(String json, Class<T> clazz){
+    	if(json==null||json.trim().length()==0){
+    		return null;
+    	}
         ObjectMapper mapper = new ObjectMapper();
         try {
             return mapper.readValue(json,clazz);
@@ -40,6 +43,9 @@ public class JsonUtil {
     }
 
     public static <T> List<T> toList(String json,Class<T> clazz){
+    	if(json==null||json.trim().length()==0){
+    		return null;
+    	}
         ObjectMapper mapper = new ObjectMapper();
         JavaType javaType = mapper.getTypeFactory().constructParametricType(List.class, clazz);
         try {
