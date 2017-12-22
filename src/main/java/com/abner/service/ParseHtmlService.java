@@ -1,12 +1,12 @@
 package com.abner.service;
 
-import java.util.List;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import com.abner.annotation.Resource;
 import com.abner.annotation.Service;
 import com.abner.db.MonitorDataStorage;
 import com.abner.db.UrlStorage;
@@ -14,7 +14,7 @@ import com.abner.enums.MonitorName;
 import com.abner.filter.ImgFilter;
 import com.abner.filter.LinkFilter;
 import com.abner.pojo.MyUrl;
-import com.google.common.collect.Lists;
+
 /**
  * 网页解析服务
  * @author wei.li
@@ -23,9 +23,15 @@ import com.google.common.collect.Lists;
 @Service
 public class ParseHtmlService {
 	
-	//win文件名不合法字符
-	private static List<Character> specialChars=Lists.newArrayList('/','\\',':','*','?','"','<','>','|');
+	@Resource
+	private VerifyService verifyService;
 
+	/**
+	 * 解析url
+	 * @param html
+	 * @param linkFilter      
+	 * void
+	 */
 	public void parseReqUrl(String html, LinkFilter linkFilter) {
 		Document doc = Jsoup.parse(html);
 		Elements as = doc.select("a[href]");
@@ -57,10 +63,16 @@ public class ParseHtmlService {
 		MonitorDataStorage.record(MonitorName.SUMIMG.name(),num);
 	}
 
+	/**
+	 * 解析图片地址
+	 * @param html
+	 * @param imgFilter      
+	 * void
+	 */
 	public void parseImgUrl(String html, ImgFilter imgFilter) {
 		Document doc = Jsoup.parse(html);
 		String title = doc.head().select("title").text();
-		title=checkTitle(title.trim());
+		title = verifyService.checkTitle(title.trim());
 		Elements imgs = doc.select("img[src]");
 		int num=0;
 		for(Element img:imgs){
@@ -73,16 +85,7 @@ public class ParseHtmlService {
 		MonitorDataStorage.record(MonitorName.SUMURL.name(),num);
 	}
 	
-	private String checkTitle(String title){
-		StringBuffer titles = new StringBuffer();
-		char[] charArray = title.toCharArray();
-		for(char a:charArray){
-			if(!specialChars.contains(a)){
-				titles.append(a);
-			}
-		}
-		return titles.toString();
-	}
+
 
 
 }

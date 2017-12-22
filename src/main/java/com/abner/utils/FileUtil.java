@@ -4,7 +4,6 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -13,36 +12,18 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.math.BigDecimal;
 
 import org.apache.log4j.Logger;
 
 /**
- * 公共工具类
+ * 文件操作工具类
  * @author wei.li
  * @time 2017年11月28日上午10:26:53
  */
-public class CommonUtil {
+public class FileUtil {
 	
-	private static  Logger logger=Logger.getLogger(CommonUtil.class);
+	private static  Logger logger=Logger.getLogger(FileUtil.class);
 	
-	
-	/**
-	 * 
-	 * 资源关闭
-	 */
-	public static void closeStream(Closeable... streams) {
-		for(Closeable stream:streams){
-			if(stream!=null){
-				try {
-					stream.close();
-				} catch (IOException e) {
-					logger.error("资源关闭异常",e);
-				}
-			}
-			
-		}
-	}
 	/**
 	 * 删除文件
 	 * 
@@ -60,8 +41,8 @@ public class CommonUtil {
 	}
 	
 	 /**
-     * 读取在本工程存放文件
-     * @param filePath 本工程存放的文件路径
+     * 读取文件
+     * @param filePath 文件路径
      * @return
      */
     public static String readFileToString(String filePath){
@@ -86,7 +67,7 @@ public class CommonUtil {
      * 
      * 写入文件
      */
-    public static  boolean writeToFile(String data,String fileName){
+    public static boolean writeToFile(String data,String fileName){
     	boolean result = false;
 		OutputStream output = null;
 		OutputStreamWriter outputWriter = null;
@@ -133,32 +114,6 @@ public class CommonUtil {
 	            return false;
 	        }
 		
-	}
-	
-	/**
-	 * 检测目录是否存在，如果不存在则创建
-	 * 
-	 */
-	public static void checkPath(String path) {
-		File file = new File(path);
-		if(!file.exists()){
-			file.mkdirs();
-		}	
-	}
-	
-	/**
-	 * 计算失败率
-	 */
-	public static double calculateRate(long doneNum, long failNum) {
-		long sum = doneNum + failNum;
-		if(sum==0){
-			return 0;
-		}
-		BigDecimal b1 = new BigDecimal(failNum);
-		BigDecimal b2 = new BigDecimal(sum);
-		BigDecimal b3 = new BigDecimal(100);
-		BigDecimal rate = b1.divide(b2,4,BigDecimal.ROUND_HALF_UP).multiply(b3);
-		return rate.doubleValue();
 	}
 
 }

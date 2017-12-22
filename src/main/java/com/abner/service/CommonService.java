@@ -1,9 +1,11 @@
 package com.abner.service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import com.abner.annotation.Resource;
 import com.abner.annotation.Service;
 import com.abner.annotation.Singleton;
 import com.abner.db.MonitorDataStorage;
@@ -12,34 +14,45 @@ import com.abner.manage.Config;
 import com.abner.manage.FilePathManage;
 import com.abner.pojo.MyUrl;
 import com.abner.pojo.UserSetting;
-import com.abner.utils.CommonUtil;
+import com.abner.utils.FileUtil;
 import com.abner.utils.JsonUtil;
 /**
  * 爬虫基础服务
  * @author LW
  * @time 2017年12月20日 下午7:45:08
  */
-@Service()
+@Service
 public class CommonService {
 	
 	private static  Logger logger=Logger.getLogger(CommonService.class);
 	
-	
+	@Resource
+	private VerifyService verifyService;
+	/**
+	 * 清除缓存
+	 *       
+	 * void
+	 */
 	public void cleanCache() {
 		UrlStorage.clear();
 		MonitorDataStorage.clear();
-		CommonUtil.writeToFile("", FilePathManage.imgUrls);
-		CommonUtil.writeToFile("", FilePathManage.reqUrls);
+		FileUtil.writeToFile("", FilePathManage.imgUrls);
+		FileUtil.writeToFile("", FilePathManage.reqUrls);
 		logger.info("缓存清理完成");
 	}
+	/**
+	 * 读取历史URL
+	 *       
+	 * void
+	 */
 	@Singleton
 	public void readUrlFile() {
 		List<MyUrl> reqUrls=null;
 		List<MyUrl> imgUrls=null;
 		try{
-			String reqUrlsStr = CommonUtil.readFileToString(FilePathManage.reqUrls);
+			String reqUrlsStr = FileUtil.readFileToString(FilePathManage.reqUrls);
 			reqUrls = JsonUtil.toList(reqUrlsStr, MyUrl.class);
-			String imgUrlsStr = CommonUtil.readFileToString(FilePathManage.imgUrls);
+			String imgUrlsStr = FileUtil.readFileToString(FilePathManage.imgUrls);
 			imgUrls = JsonUtil.toList(imgUrlsStr, MyUrl.class);
 		}catch(Exception e){
 			logger.error("加载历史url失败",e);
@@ -51,10 +64,16 @@ public class CommonService {
 			UrlStorage.addImg(imgUrls);
 		}
 	}
+	
+	/**
+	 * 读取用户配置信息
+	 *       
+	 * void
+	 */
 	@Singleton
 	public void readUserSetting() {
 		try{
-			String setting = CommonUtil.readFileToString(FilePathManage.userSetting);
+			String setting = FileUtil.readFileToString(FilePathManage.userSetting);
 			UserSetting userSetting = JsonUtil.toBean(setting, UserSetting.class);
 			userSetting.toConfig();
 		}catch(Exception e){
@@ -62,6 +81,11 @@ public class CommonService {
 		}
 	}
 	
+	/**
+	 * 修复上次残留URL
+	 *       
+	 * void
+	 */
 	@Singleton
 	public void restoreLink() {
 		restoreLink(UrlStorage.getImgs());
@@ -75,18 +99,41 @@ public class CommonService {
 			}
 		}
 	}
-	
+	/**
+	 * 保存url
+	 *       
+	 * void
+	 */
 	public void saveUrlFile() {
-		CommonUtil.checkPath(FilePathManage.configPath);
+		verifyService.checkPath(FilePathManage.configPath);
 		String reqUrls = JsonUtil.toString(UrlStorage.getUrls());
-		CommonUtil.writeToFile(reqUrls, FilePathManage.reqUrls);
+		FileUtil.writeToFile(reqUrls, FilePathManage.reqUrls);
 		String imgUrls = JsonUtil.toString(UrlStorage.getImgs());
-		CommonUtil.writeToFile(imgUrls, FilePathManage.imgUrls);
+		FileUtil.writeToFile(imgUrls, FilePathManage.imgUrls);
+	}
+	/**
+	 * 保存用户配置
+	 *       
+	 * void
+	 */
+	public void saveUserSetting() {
+		verifyService.checkPath(FilePathManage.configPath);
+		FileUtil.writeToFile(JsonUtil.toString(Config.userSetting), FilePathManage.userSetting);
 	}
 	
-	public void saveUserSetting() {
-		CommonUtil.checkPath(FilePathManage.configPath);
-		CommonUtil.writeToFile(JsonUtil.toString(Config.userSetting), FilePathManage.userSetting);
+	/**
+	 * 计算失败率
+	 */
+	public double calculateRate(long doneNum, long failNum) {
+		long sum = doneNum + failNum;
+		if(sum==0){
+			return 0;
+		}
+		BigDecimal b1 = new BigDecimal(failNum);
+		BigDecimal b2 = new BigDecimal(sum);
+		BigDecimal b3 = new BigDecimal(100);
+		BigDecimal rate = b1.divide(b2,4,BigDecimal.ROUND_HALF_UP).multiply(b3);
+		return rate.doubleValue();
 	}
 
 }

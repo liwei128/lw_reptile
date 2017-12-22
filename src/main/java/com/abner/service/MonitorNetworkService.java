@@ -1,7 +1,6 @@
 package com.abner.service;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.concurrent.TimeUnit;
@@ -47,7 +46,7 @@ public class MonitorNetworkService{
 			}
 			String ping = sbf.substring(sbf.lastIndexOf("=")+1).trim();
 			return Integer.parseInt(ping.substring(0, ping.indexOf("ms")));
-		} catch (IOException e) {
+		} catch (Exception e) {
 			logger.error("网络监控出现异常",e);
 			return 0;
 		}finally {

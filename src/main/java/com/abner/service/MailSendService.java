@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import com.abner.annotation.Async;
+import com.abner.annotation.Resource;
 import com.abner.annotation.Service;
 import com.abner.annotation.Stop;
 import com.abner.annotation.Timing;
@@ -11,8 +12,6 @@ import com.abner.db.MonitorDataStorage;
 import com.abner.manage.Config;
 import com.abner.enums.MonitorName;
 import com.abner.enums.TimingType;
-import com.abner.utils.CommonUtil;
-import com.abner.utils.EmailSendUtils;
 /**
  * 邮件发送服务
  * @author wei.li
@@ -20,6 +19,12 @@ import com.abner.utils.EmailSendUtils;
  */
 @Service
 public class MailSendService{
+	
+	@Resource
+	private HttpService httpService;
+	
+	@Resource
+	private CommonService commonService;
 	
 
 	@Timing(initialDelay = 60, period = 60, type = TimingType.FIXED_RATE, unit = TimeUnit.MINUTES)
@@ -30,7 +35,7 @@ public class MailSendService{
 		Map<String, Long> allMonitorData = MonitorDataStorage.getAllMonitorData();
 		String head = builderRunHead();
 		String body=builderBody(allMonitorData);
-		EmailSendUtils.sendMail(Config.emailAddress, head+body);
+		httpService.sendMail(Config.emailAddress, head+body);
 		
 	}
 
@@ -43,7 +48,7 @@ public class MailSendService{
 		Map<String, Long> allMonitorData = MonitorDataStorage.getAllMonitorData();
 		String head = builderEndHead();
 		String body = builderBody(allMonitorData);
-		EmailSendUtils.sendMail(Config.emailAddress, head+body);
+		httpService.sendMail(Config.emailAddress, head+body);
 	}
 	
 	
@@ -66,11 +71,11 @@ public class MailSendService{
 		Long sumUrl = monitorData.get(MonitorName.SUMURL.name());
 		Long doneUrl = monitorData.get(MonitorName.DONEURL.name());
 		Long failUrl = monitorData.get(MonitorName.FAILURL.name());
-		double urlRate = CommonUtil.calculateRate(doneUrl, failUrl);
+		double urlRate = commonService.calculateRate(doneUrl, failUrl);
 		Long sumImg = monitorData.get(MonitorName.SUMIMG.name());
 		Long doneImg = monitorData.get(MonitorName.DONEIMG.name());
 		Long failImg = monitorData.get(MonitorName.FAILIMG.name());
-		double imgRate = CommonUtil.calculateRate(doneImg, failImg);
+		double imgRate = commonService.calculateRate(doneImg, failImg);
 		long memory = Runtime.getRuntime().totalMemory()/1024/1024;
 		//组装邮件内容
 		StringBuilder stringBuilder = new StringBuilder();

@@ -5,7 +5,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 /**
- * 方法是否单次运行
+ * 方法单次运行
+ * 方法注解，可以和所有方法注解组合使用
  * @author wei.li
  * @time 2017年11月23日下午12:48:15
  */

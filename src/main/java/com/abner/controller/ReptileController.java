@@ -2,8 +2,6 @@ package com.abner.controller;
 
 import java.util.Map;
 
-import org.apache.log4j.Logger;
-
 import com.abner.annotation.Controller;
 import com.abner.annotation.Resource;
 import com.abner.annotation.Singleton;
@@ -24,8 +22,6 @@ import com.abner.service.MonitorNetworkService;
  */
 @Controller
 public class ReptileController {
-	
-	private static  Logger logger=Logger.getLogger(ReptileController.class);
 	
 	@Resource
 	private CommonService commonService;
@@ -97,6 +93,10 @@ public class ReptileController {
 	//获取监控信息
 	public Map<String,Long> getAllMonitorData(int timeMinutes) {
 		return MonitorDataStorage.getAllMonitorData(timeMinutes);
+	}
+	//计算失败率
+	public double calculateRate(Long doneUrl, Long failUrl) {
+		return commonService.calculateRate(doneUrl, failUrl);
 	}
 	
 }
