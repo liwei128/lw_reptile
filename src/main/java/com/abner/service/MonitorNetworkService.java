@@ -5,7 +5,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.abner.annotation.Service;
 import com.abner.annotation.Singleton;
@@ -20,7 +21,7 @@ import com.abner.enums.TimingType;
 @Service
 public class MonitorNetworkService{
 	
-	private static  Logger logger=Logger.getLogger(MonitorNetworkService.class);
+	private static  Logger logger = LoggerFactory.getLogger(MonitorNetworkService.class);
 	
 	@Singleton
 	@Timing(initialDelay = 500, period = 500, type = TimingType.FIXED_DELAY, unit = TimeUnit.MILLISECONDS)

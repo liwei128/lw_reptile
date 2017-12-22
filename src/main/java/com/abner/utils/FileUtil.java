@@ -13,7 +13,9 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /**
  * 文件操作工具类
@@ -22,7 +24,7 @@ import org.apache.log4j.Logger;
  */
 public class FileUtil {
 	
-	private static  Logger logger=Logger.getLogger(FileUtil.class);
+	private static  Logger logger = LoggerFactory.getLogger(FileUtil.class);
 	
 	/**
 	 * 删除文件

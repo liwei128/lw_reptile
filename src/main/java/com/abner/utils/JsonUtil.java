@@ -3,10 +3,11 @@ package com.abner.utils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.log4j.Logger;
-
 import java.io.IOException;
 import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 
@@ -15,7 +16,8 @@ import java.util.List;
  * Created On 2017-11-29 11:48
  */
 public class JsonUtil {
-    private static Logger logger=Logger.getLogger(JsonUtil.class);
+	
+	private static  Logger logger = LoggerFactory.getLogger(JsonUtil.class);
 
     public static String toString(Object obj){
         ObjectMapper mapper = new ObjectMapper();
