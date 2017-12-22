@@ -13,11 +13,12 @@ import com.abner.annotation.Service;
 import com.abner.interceptor.TaskInterceptor;
 import com.google.common.collect.Maps;
 import net.sf.cglib.proxy.Enhancer;
+
 /**
  * 任务工厂
  * 可实现依赖注入
  * @author LW
- *
+ * @time 2017年12月22日 下午10:01:48
  */
 public class ServiceFactory {	
 	
