@@ -73,14 +73,14 @@ public class LoadImgService{
 		try {
 			ReptileRetData retData = httpService.download(fileDownloadDto);
 			if(ReptileRetData.SUCCESS == retData){
-				logger.info("图片下载成功,时间："+(System.currentTimeMillis()-imgUrl.getStartTime())+"ms ,保存路径："+fileDownloadDto.getFilePath());
+				logger.info("图片下载成功,时间："+imgUrl.loadTime()+"ms ,保存路径："+fileDownloadDto.getFilePath());
 				MonitorDataStorage.record(MonitorName.DONEIMG.name());
 			}
 			if(ReptileRetData.OVER_LIMIT == retData){
 				logger.info("图片:"+imgUrl.getUrl()+",小于"+fileDownloadDto.getMinLimit()+"kb");
 			}
 		} catch (Exception e) {
-			logger.error("图片下载失败,时间:"+(System.currentTimeMillis()-imgUrl.getStartTime())+"ms,网址:"+imgUrl.getUrl());
+			logger.error("图片下载失败,时间:"+imgUrl.loadTime()+"ms,网址:"+imgUrl.getUrl());
 			FileUtil.deleteFile(fileDownloadDto.getFilePath()+"/"+fileDownloadDto.getFileName());
 			MonitorDataStorage.record(MonitorName.FAILIMG.name());
 		}finally {
