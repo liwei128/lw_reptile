@@ -80,7 +80,7 @@ public class LoadImgService{
 				logger.info("图片:"+imgUrl.getUrl()+",小于"+fileDownloadDto.getMinLimit()+"kb");
 			}
 		} catch (Exception e) {
-			logger.error("图片下载失败,时间:"+imgUrl.loadTime()+"ms,网址:"+imgUrl.getUrl());
+			logger.error("图片下载失败,时间:"+imgUrl.loadTime()+"ms,网址:"+imgUrl.getUrl(),e);
 			FileUtil.deleteFile(fileDownloadDto.getFilePath()+"/"+fileDownloadDto.getFileName());
 			MonitorDataStorage.record(MonitorName.FAILIMG.name());
 		}finally {
