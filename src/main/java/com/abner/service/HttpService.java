@@ -116,7 +116,7 @@ public class HttpService {
 				throw new GetUrlException("Phantomjs请求异常,网址:"+url);
 			}
 			return result;
-		} catch (Exception e) {
+		} catch (IOException e) {
 			FileUtil.copyFile(FilePathManage.exeBackups,FilePathManage.exe);
 			throw new GetUrlException("Phantomjs请求异常,网址:"+url);
 		}finally {
