@@ -87,7 +87,7 @@ public class TaskInterceptor implements MethodInterceptor{
 				List<Class<?>> clazzs = Lists.newArrayList(retry.retException());
 				logger.error("error:",e);
 				if(clazzs.contains(e.getClass())){
-					logger.info("准备重试:{}",count);
+					logger.info("准备重试:{},方法:{},参数:{}",count,method.getName(),args);
 				}else{
 					throw e;
 				}
