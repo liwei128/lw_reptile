@@ -65,7 +65,16 @@ public class TaskInterceptor implements MethodInterceptor{
 		
 	}
 
-
+	/**
+	 * 重试方法
+	 * @param obj
+	 * @param method
+	 * @param args
+	 * @param proxy
+	 * @return
+	 * @throws Throwable      
+	 * Object
+	 */
 	private Object retryTask(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
 		Retry retry = method.getAnnotation(Retry.class);
 		int count = 0;
@@ -86,7 +95,15 @@ public class TaskInterceptor implements MethodInterceptor{
 		return proxy.invokeSuper(obj, args);
 	}
 
-
+	/**
+	 * 异步方法
+	 * @param obj
+	 * @param method
+	 * @param args
+	 * @param proxy
+	 * @return      
+	 * Object
+	 */
 	private Object asyncTask(Object obj, Method method, Object[] args, MethodProxy proxy) {
 		MyThreadPool.execute(new Runnable() {
 			@Override
@@ -101,7 +118,14 @@ public class TaskInterceptor implements MethodInterceptor{
 		return null;
 	}
 
-
+	/**
+	 * 停止定时任务
+	 * @param obj
+	 * @param method
+	 * @param args
+	 * @param proxy      
+	 * void
+	 */
 	private void stopTimingTask(Object obj, Method method, Object[] args, MethodProxy proxy) {
 		String[] methods = method.getAnnotation(Stop.class).methods();
 		for(String methodName : methods){
@@ -113,7 +137,15 @@ public class TaskInterceptor implements MethodInterceptor{
 		}
 	}
 
-
+	/**
+	 * 定时任务
+	 * @param obj
+	 * @param method
+	 * @param args
+	 * @param proxy
+	 * @return      
+	 * Object
+	 */
 	private Object timingTask(Object obj, Method method, Object[] args, MethodProxy proxy) {
 		logger.info("定时任务："+method.getName()+" 启动");
 		Timing timing = method.getAnnotation(Timing.class);
@@ -137,7 +169,12 @@ public class TaskInterceptor implements MethodInterceptor{
 		return null;
 	}
 
-
+	/**
+	 * 校验单例方法
+	 * @param method
+	 * @return      
+	 * boolean
+	 */
 	private boolean checkReq(Method method) {
 		synchronized (method) {
 			if(singletonMethods.get(method.getName())!=null){
@@ -153,7 +190,10 @@ public class TaskInterceptor implements MethodInterceptor{
 		
 	}
 
-
+	/**
+	 * 收集所有单例方法
+	 * @param clazz
+	 */
 	public TaskInterceptor(Class<?> clazz) {
 		Method[] methods = clazz.getMethods();
 		for(Method method:methods){
