@@ -5,7 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ScheduledFuture;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.abner.annotation.Async;
 import com.abner.annotation.Retry;
@@ -26,7 +27,7 @@ import net.sf.cglib.proxy.MethodProxy;
  */
 public class TaskInterceptor implements MethodInterceptor{
 	
-	private static  Logger logger=Logger.getLogger(TaskInterceptor.class);
+	private static  Logger logger = LoggerFactory.getLogger(TaskInterceptor.class);
 	
 	private Map<String,Boolean> singletonMethods = Maps.newHashMap();
 	
@@ -86,7 +87,7 @@ public class TaskInterceptor implements MethodInterceptor{
 				List<Class<?>> clazzs = Lists.newArrayList(retry.retException());
 				logger.error("error:",e);
 				if(clazzs.contains(e.getClass())){
-					logger.info("准备重试:"+count);
+					logger.info("准备重试:{}",count);
 				}else{
 					throw e;
 				}
@@ -132,7 +133,7 @@ public class TaskInterceptor implements MethodInterceptor{
 			ScheduledFuture<?> futureByName = futures.get(methodName);
 			if(futureByName!=null){
 				futureByName.cancel(false);
-				logger.info("定时任务："+methodName+" 停止");
+				logger.info("定时任务:{} 停止",methodName);
 			}
 		}
 	}
@@ -147,7 +148,7 @@ public class TaskInterceptor implements MethodInterceptor{
 	 * Object
 	 */
 	private Object timingTask(Object obj, Method method, Object[] args, MethodProxy proxy) {
-		logger.info("定时任务："+method.getName()+" 启动");
+		logger.info("定时任务：{} 启动",method.getName());
 		Timing timing = method.getAnnotation(Timing.class);
 		Runnable runnable = new Runnable() {
 			@Override
@@ -182,7 +183,7 @@ public class TaskInterceptor implements MethodInterceptor{
 					singletonMethods.put(method.getName(), false);
 					return true;
 				}
-				logger.error("方法："+method.getName()+" 不允许多次调用");
+				logger.error("方法:{} 不允许多次调用",method.getName());
 				return false;
 			}
 			return true;

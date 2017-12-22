@@ -2,7 +2,8 @@ package com.abner.db;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.abner.manage.Config;
 import com.abner.pojo.PhantomjsProcesses;
@@ -14,7 +15,7 @@ import com.google.common.collect.Lists;
  */
 public class PhantomjsStorage {
 	
-	private static  Logger logger=Logger.getLogger(PhantomjsStorage.class);
+	private static  Logger logger = LoggerFactory.getLogger(PhantomjsStorage.class);
 	//phantomjs线程集合
 	public static List<PhantomjsProcesses> phantomjsProcessess=Lists.newArrayList();
 	
@@ -27,7 +28,7 @@ public class PhantomjsStorage {
 			PhantomjsProcesses p = phantomjsProcessess.get(i);
 			long time =p.getTime();
 			if(p.isAlive()&&time>Config.cleanPhantomjsTime*1000){
-				logger.error("phantomjs进程懵逼, 懵逼时长:"+time+"ms");
+				logger.error("phantomjs进程懵逼, 懵逼时长:{}ms",time);
 				p.destroy();
 				logger.info("成功清理假死phantomjs进程");
 			}

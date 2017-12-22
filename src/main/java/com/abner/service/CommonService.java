@@ -2,8 +2,8 @@ package com.abner.service;
 
 import java.math.BigDecimal;
 import java.util.List;
-
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.abner.annotation.Resource;
 import com.abner.annotation.Service;
@@ -24,7 +24,7 @@ import com.abner.utils.JsonUtil;
 @Service
 public class CommonService {
 	
-	private static  Logger logger=Logger.getLogger(CommonService.class);
+	private static  Logger logger = LoggerFactory.getLogger(CommonService.class);
 	
 	@Resource
 	private VerifyService verifyService;
@@ -105,11 +105,13 @@ public class CommonService {
 	 * void
 	 */
 	public void saveUrlFile() {
+		long startTime = System.currentTimeMillis();
 		verifyService.checkPath(FilePathManage.configPath);
 		String reqUrls = JsonUtil.toString(UrlStorage.getUrls());
 		FileUtil.writeToFile(reqUrls, FilePathManage.reqUrls);
 		String imgUrls = JsonUtil.toString(UrlStorage.getImgs());
 		FileUtil.writeToFile(imgUrls, FilePathManage.imgUrls);
+		logger.info("地址保存，耗时:{}ms",System.currentTimeMillis()-startTime);
 	}
 	/**
 	 * 保存用户配置

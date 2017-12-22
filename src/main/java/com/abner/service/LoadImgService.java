@@ -3,7 +3,8 @@ package com.abner.service;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.abner.annotation.Async;
 import com.abner.annotation.Resource;
@@ -28,7 +29,7 @@ import com.abner.utils.FileUtil;
 @Service
 public class LoadImgService{
 	
-	private static  Logger logger=Logger.getLogger(LoadImgService.class);
+	private static  Logger logger = LoggerFactory.getLogger(LoadImgService.class);
 	
 	@Resource
 	private HttpService httpService;
@@ -42,7 +43,7 @@ public class LoadImgService{
 			return;
 		}
 		List<MyUrl> imgurls = UrlStorage.getNeedImgs(Config.velocity*20);
-		logger.info("图片下载队列："+imgurls.size());
+		logger.info("图片下载队列:{}",imgurls.size());
 		if(imgurls.size()==0){
 			StatusManage.imgFinish = true;
 			return;
@@ -73,14 +74,14 @@ public class LoadImgService{
 		try {
 			ReptileRetData retData = httpService.download(fileDownloadDto);
 			if(ReptileRetData.SUCCESS == retData){
-				logger.info("图片下载成功,时间："+imgUrl.loadTime()+"ms ,保存路径："+fileDownloadDto.getFilePath());
+				logger.info("图片下载成功,时间:{}ms, 保存路径:{}",imgUrl.loadTime(),fileDownloadDto.getFilePath());
 				MonitorDataStorage.record(MonitorName.DONEIMG.name());
 			}
 			if(ReptileRetData.OVER_LIMIT == retData){
-				logger.info("图片:"+imgUrl.getUrl()+",小于"+fileDownloadDto.getMinLimit()+"kb");
+				logger.info("图片:{},小于{}kb",imgUrl.getUrl(),fileDownloadDto.getMinLimit());
 			}
 		} catch (Exception e) {
-			logger.error("图片下载失败,时间:"+imgUrl.loadTime()+"ms,网址:"+imgUrl.getUrl(),e);
+			logger.error("图片下载失败,时间:{}ms, 网址:{}",imgUrl.loadTime(),imgUrl.getUrl(),e);
 			FileUtil.deleteFile(fileDownloadDto.getFilePath()+"/"+fileDownloadDto.getFileName());
 			MonitorDataStorage.record(MonitorName.FAILIMG.name());
 		}finally {

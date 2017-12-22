@@ -21,7 +21,8 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.DefaultConnectionKeepAliveStrategy;
 import org.apache.http.impl.client.DefaultRedirectStrategy;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.abner.annotation.Resource;
 import com.abner.annotation.Retry;
@@ -44,7 +45,7 @@ import com.abner.utils.FileUtil;
 @Service
 public class HttpService {
 	
-	private static  Logger logger=Logger.getLogger(HttpService.class);
+	private static  Logger logger = LoggerFactory.getLogger(HttpService.class);
 	
 	private static Session session = createSession();
 	
@@ -145,9 +146,9 @@ public class HttpService {
             transport.sendMessage(message, message.getAllRecipients());
             //关闭连接
             transport.close();
-            logger.info("邮件成功发送到:"+Config.emailAddress);
+            logger.info("邮件成功发送到:{}",Config.emailAddress);
     	}catch(Exception e){
-    		throw new EmailException("邮件发送失败："+Config.emailAddress);
+    		throw new EmailException("邮件发送失败"+Config.emailAddress);
     	}
         
     }

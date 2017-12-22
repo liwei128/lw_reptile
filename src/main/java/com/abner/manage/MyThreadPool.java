@@ -9,7 +9,10 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+
 
 /**
  * 线程池
@@ -19,7 +22,8 @@ import org.apache.log4j.Logger;
 
 public class MyThreadPool {
 	
-	private static  Logger logger=Logger.getLogger(MyThreadPool.class);
+	private static  Logger logger = LoggerFactory.getLogger(MyThreadPool.class);
+	
 	/**
 	 * 线程池基本大小
 	 */

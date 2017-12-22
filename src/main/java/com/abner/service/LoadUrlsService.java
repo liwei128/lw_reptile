@@ -3,7 +3,8 @@ package com.abner.service;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.abner.annotation.Async;
 import com.abner.annotation.Resource;
@@ -29,7 +30,7 @@ import com.abner.enums.TimingType;
 @Service
 public class LoadUrlsService{
 	
-	private static  Logger logger=Logger.getLogger(LoadUrlsService.class);
+	private static  Logger logger = LoggerFactory.getLogger(LoadUrlsService.class);
 	
 	@Resource
 	private HttpService httpService;
@@ -47,7 +48,7 @@ public class LoadUrlsService{
 		}
 		//获取需要抓取的url
 		List<MyUrl> urls = UrlStorage.getNeedUrls(Config.velocity*2);
-		logger.info("网页加载队列："+urls.size());
+		logger.info("网页加载队列:{}",urls.size());
 		if(urls.size()==0){
 			StatusManage.urlFinish = true;
 			return;
@@ -78,13 +79,13 @@ public class LoadUrlsService{
 		try{
 			String html = httpService.get(reqUrl.getUrl());
 			MonitorDataStorage.record(MonitorName.DONEURL.name());
-			logger.info("网页加载成功,时间:"+reqUrl.loadTime()+"ms,网址:"+reqUrl.getUrl());
+			logger.info("网页加载成功,时间:{}ms, 网址:{}",reqUrl.loadTime(),reqUrl.getUrl());
 			parseHtmlService.parseReqUrl(html,new LinkFilter(reqUrl.getUrl()));
 			parseHtmlService.parseImgUrl(html,new ImgFilter(reqUrl.getUrl()));
 			return true;
 		}catch(Exception e){
 			MonitorDataStorage.record(MonitorName.FAILURL.name());
-			logger.error("网页加载失败,时间:"+reqUrl.loadTime()+"ms,网址:"+reqUrl.getUrl(),e);
+			logger.error("网页加载失败,时间:{}ms, 网址:{}",reqUrl.loadTime(),reqUrl.getUrl(),e);
 			return false;
 		}finally {
 			reqUrl.setAlreadyLoad(true);

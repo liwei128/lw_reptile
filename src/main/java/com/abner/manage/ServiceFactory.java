@@ -3,9 +3,9 @@ package com.abner.manage;
 import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.Set;
-
-import org.apache.log4j.Logger;
 import org.reflections.Reflections;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.abner.annotation.Controller;
 import com.abner.annotation.Resource;
@@ -13,15 +13,16 @@ import com.abner.annotation.Service;
 import com.abner.interceptor.TaskInterceptor;
 import com.google.common.collect.Maps;
 import net.sf.cglib.proxy.Enhancer;
+
 /**
  * 任务工厂
  * 可实现依赖注入
  * @author LW
- *
+ * @time 2017年12月22日 下午10:01:48
  */
 public class ServiceFactory {	
 	
-	private static  Logger logger = Logger.getLogger(ServiceFactory.class);
+	private static  Logger logger = LoggerFactory.getLogger(ServiceFactory.class);
 	
 	private static String packageName = "com.abner";
 	
@@ -63,9 +64,9 @@ public class ServiceFactory {
 				}
 			}
 			serviceMap.put(clazz.getName(), create);
-			logger.info(clazz.getName()+" 创建成功");
+			logger.info("{} 创建成功",clazz.getName());
 		}catch(Exception e){
-			logger.error(clazz.getName()+" 创建失败",e);
+			logger.error("{} 创建失败",clazz.getName(),e);
 		}
 	}
 
