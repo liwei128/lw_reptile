@@ -7,6 +7,7 @@ import java.lang.annotation.Target;
 
 /**
  * 任务停止注解,用于停止定时任务
+ * 方法注解，可以和@Async @Singleton 组合使用
  * @author LW
  * @time 2017年12月20日 上午9:58:23
  */

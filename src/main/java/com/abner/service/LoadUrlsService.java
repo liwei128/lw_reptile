@@ -6,6 +6,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.log4j.Logger;
 
 import com.abner.annotation.Async;
+import com.abner.annotation.Resource;
 import com.abner.annotation.Service;
 import com.abner.annotation.Stop;
 import com.abner.annotation.Timing;
@@ -19,7 +20,6 @@ import com.abner.manage.StatusManage;
 import com.abner.enums.MonitorName;
 import com.abner.pojo.MyUrl;
 import com.abner.enums.TimingType;
-import com.abner.utils.LoadUrlUtil;
 
 /**
  * 异步抓取网页服务
@@ -27,9 +27,18 @@ import com.abner.utils.LoadUrlUtil;
  * @time 2017年11月23日下午1:22:42
  */
 @Service
-public class LoadUrlsService extends BaseAsyncService{
+public class LoadUrlsService{
 	
 	private static  Logger logger=Logger.getLogger(LoadUrlsService.class);
+	
+	@Resource
+	private HttpService httpService;
+	
+	@Resource
+	private ParseHtmlService parseHtmlService;
+	
+	@Resource
+	private VerifyService verifyService;
 	
 	@Timing(initialDelay = 0, period = 5, type = TimingType.FIXED_RATE, unit = TimeUnit.SECONDS)
 	public void loadUrl() {
@@ -46,7 +55,7 @@ public class LoadUrlsService extends BaseAsyncService{
 		StatusManage.urlFinish = false;
 		//抓取
 		for(MyUrl url : urls){
-			if(isStart(url)){
+			if(verifyService.isStart(url)){
 				load(url);
 			}
 		}
@@ -66,26 +75,21 @@ public class LoadUrlsService extends BaseAsyncService{
 	
 	@Async
 	public boolean load(MyUrl reqUrl) {
-		int count = 0;
-		while(count<3){
-			count++;
-			String html = LoadUrlUtil.get(reqUrl.getUrl());
-			//若失败，则再请求一次
-			if(html.length()!=0){
-				MonitorDataStorage.record(MonitorName.DONEURL.name());
-				logger.info("网页加载成功,时间:"+reqUrl.loadTime()+"ms,网址:"+reqUrl.getUrl());
-				int reqNum = LoadUrlUtil.loadReqUrl(html,new LinkFilter(reqUrl.getUrl()));
-				MonitorDataStorage.record(MonitorName.SUMIMG.name(),reqNum);
-				int imageNum = LoadUrlUtil.loadImageUrl(html,new ImgFilter(reqUrl.getUrl()));
-				MonitorDataStorage.record(MonitorName.SUMURL.name(),imageNum);
-				reqUrl.setAlreadyLoad(true);
-				return true;
-			}
+		try{
+			String html = httpService.get(reqUrl.getUrl());
+			MonitorDataStorage.record(MonitorName.DONEURL.name());
+			logger.info("网页加载成功,时间:"+reqUrl.loadTime()+"ms,网址:"+reqUrl.getUrl());
+			parseHtmlService.parseReqUrl(html,new LinkFilter(reqUrl.getUrl()));
+			parseHtmlService.parseImgUrl(html,new ImgFilter(reqUrl.getUrl()));
+			return true;
+		}catch(Exception e){
+			MonitorDataStorage.record(MonitorName.FAILURL.name());
+			logger.error("网页加载失败,时间:"+reqUrl.loadTime()+"ms,网址:"+reqUrl.getUrl(),e);
+			return false;
+		}finally {
+			reqUrl.setAlreadyLoad(true);
 		}
-		MonitorDataStorage.record(MonitorName.FAILURL.name());
-		logger.error("网页加载失败,时间:"+reqUrl.loadTime()+"ms,网址:"+reqUrl.getUrl());
-		reqUrl.setAlreadyLoad(true);
-		return false;
+		
 	}
 	
 

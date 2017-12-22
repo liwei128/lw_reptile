@@ -24,7 +24,7 @@ import com.abner.manage.Config;
 import com.abner.manage.ServiceFactory;
 import com.abner.manage.StatusManage;
 import com.abner.pojo.UserSetting;
-import com.abner.utils.CommonUtil;
+
 /**
  * 爬虫事件
  * @author wei.li
@@ -216,11 +216,11 @@ public abstract class AbstractReptileFunction {
 		Long sumUrl = monitorData.get(MonitorName.SUMURL.name());
 		Long doneUrl = monitorData.get(MonitorName.DONEURL.name());
 		Long failUrl = monitorData.get(MonitorName.FAILURL.name());
-		double urlRate = CommonUtil.calculateRate(doneUrl, failUrl);
+		double urlRate = reptileController.calculateRate(doneUrl, failUrl);
 		Long sumImg = monitorData.get(MonitorName.SUMIMG.name());
 		Long doneImg = monitorData.get(MonitorName.DONEIMG.name());
 		Long failImg = monitorData.get(MonitorName.FAILIMG.name());
-		double imgRate = CommonUtil.calculateRate(doneImg, failImg);
+		double imgRate = reptileController.calculateRate(doneImg, failImg);
 		//展示
 		getSumUrlText().setText(String.valueOf(sumUrl));
 		getDoneUrlText().setText(String.valueOf(doneUrl));
