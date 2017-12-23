@@ -64,9 +64,9 @@ public class ServiceFactory {
 				}
 			}
 			serviceMap.put(clazz.getName(), create);
-			logger.info("create instance {} success",clazz.getName());
+			logger.info("{} 创建成功",clazz.getName());
 		}catch(Exception e){
-			logger.error("create instance {} fail",clazz.getName(),e);
+			logger.error("{} 创建失败",clazz.getName(),e);
 		}
 	}
 

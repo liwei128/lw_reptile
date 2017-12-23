@@ -82,12 +82,13 @@ public class TaskInterceptor implements MethodInterceptor{
 		Throwable result = new RuntimeException("retry error");
 		while(count<=retry.count()){
 			if(count!=0){
-				logger.info("retry:{},method:{},parameters:{}",count,method.getName(),args);
+				logger.info("重试:{},方法:{},参数:{}",count,method.getName(),args);
 			}
 			try {
 				return proxy.invokeSuper(obj, args);
 			} catch (Throwable e) {
-				logger.error("error",result = e);
+				result = e;
+				logger.error("error:{},msg:{}",e.getClass().getName(),e.getMessage());
 				List<Class<?>> clazzs = Lists.newArrayList(retry.retException());
 				if(!clazzs.contains(e.getClass())){
 					throw e;
@@ -114,7 +115,7 @@ public class TaskInterceptor implements MethodInterceptor{
 				try {
 					proxy.invokeSuper(obj, args);
 				} catch (Throwable e) {
-					logger.error("async method:{} error",method.getName(),e);
+					logger.error("异步方法 :{} 发生错误:{}",method.getName(),e.getMessage());
 				}
 			}
 		});
@@ -135,7 +136,7 @@ public class TaskInterceptor implements MethodInterceptor{
 			ScheduledFuture<?> futureByName = futures.get(methodName);
 			if(futureByName!=null){
 				futureByName.cancel(false);
-				logger.info("TimingTask:{} stop.",methodName);
+				logger.info("定时任务:{} 停止.",methodName);
 			}
 		}
 	}
@@ -150,7 +151,7 @@ public class TaskInterceptor implements MethodInterceptor{
 	 * Object
 	 */
 	private Object timingTask(Object obj, Method method, Object[] args, MethodProxy proxy) {
-		logger.info("TimingTask:{} start.",method.getName());
+		logger.info("定时任务:{} 开始.",method.getName());
 		Timing timing = method.getAnnotation(Timing.class);
 		Runnable runnable = new Runnable() {
 			@Override
@@ -158,7 +159,7 @@ public class TaskInterceptor implements MethodInterceptor{
 				try {
 					proxy.invokeSuper(obj, args);
 				} catch (Throwable e) {
-					e.printStackTrace();
+					logger.error("定时任务:{} 发生错误:{}",method.getName(),e.getMessage());
 				}
 			}
 		};
@@ -185,7 +186,7 @@ public class TaskInterceptor implements MethodInterceptor{
 					singletonMethods.put(method.getName(), false);
 					return true;
 				}
-				logger.error("method:{} multiple calls are not allowed",method.getName());
+				logger.error("方法:{} 不允许多次调用",method.getName());
 				return false;
 			}
 			return true;
