@@ -85,7 +85,7 @@ public class LoadUrlsService{
 			return true;
 		}catch(Exception e){
 			MonitorDataStorage.record(MonitorName.FAILURL.name());
-			logger.error("网页加载失败,时间:{}ms, 网址:{}",reqUrl.loadTime(),reqUrl.getUrl(),e);
+			logger.error("网页加载失败,时间:{}ms, 网址:{}",reqUrl.loadTime(),reqUrl.getUrl());
 			return false;
 		}finally {
 			reqUrl.setAlreadyLoad(true);

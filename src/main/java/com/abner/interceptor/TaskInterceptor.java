@@ -79,21 +79,24 @@ public class TaskInterceptor implements MethodInterceptor{
 	private Object retryTask(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
 		Retry retry = method.getAnnotation(Retry.class);
 		int count = 0;
-		while(count<retry.count()){
-			count++;
+		Throwable result = new RuntimeException("retry error");
+		while(count<=retry.count()){
+			if(count!=0){
+				logger.info("重试:{},方法:{},参数:{}",count,method.getName(),args);
+			}
 			try {
 				return proxy.invokeSuper(obj, args);
 			} catch (Throwable e) {
+				result = e;
+				logger.error("error:{},msg:{}",e.getClass().getName(),e.getMessage());
 				List<Class<?>> clazzs = Lists.newArrayList(retry.retException());
-				logger.error("error:",e);
-				if(clazzs.contains(e.getClass())){
-					logger.info("准备重试:{}",count);
-				}else{
+				if(!clazzs.contains(e.getClass())){
 					throw e;
 				}
 			}
+			count++;
 		}
-		return proxy.invokeSuper(obj, args);
+		throw result;
 	}
 
 	/**
@@ -112,7 +115,7 @@ public class TaskInterceptor implements MethodInterceptor{
 				try {
 					proxy.invokeSuper(obj, args);
 				} catch (Throwable e) {
-					e.printStackTrace();
+					logger.error("异步方法 :{} 发生错误:{}",method.getName(),e.getMessage());
 				}
 			}
 		});
@@ -133,7 +136,7 @@ public class TaskInterceptor implements MethodInterceptor{
 			ScheduledFuture<?> futureByName = futures.get(methodName);
 			if(futureByName!=null){
 				futureByName.cancel(false);
-				logger.info("定时任务:{} 停止",methodName);
+				logger.info("定时任务:{} 停止.",methodName);
 			}
 		}
 	}
@@ -148,7 +151,7 @@ public class TaskInterceptor implements MethodInterceptor{
 	 * Object
 	 */
 	private Object timingTask(Object obj, Method method, Object[] args, MethodProxy proxy) {
-		logger.info("定时任务：{} 启动",method.getName());
+		logger.info("定时任务:{} 开始.",method.getName());
 		Timing timing = method.getAnnotation(Timing.class);
 		Runnable runnable = new Runnable() {
 			@Override
@@ -156,7 +159,7 @@ public class TaskInterceptor implements MethodInterceptor{
 				try {
 					proxy.invokeSuper(obj, args);
 				} catch (Throwable e) {
-					e.printStackTrace();
+					logger.error("定时任务:{} 发生错误:{}",method.getName(),e.getMessage());
 				}
 			}
 		};
