@@ -79,21 +79,23 @@ public class TaskInterceptor implements MethodInterceptor{
 	private Object retryTask(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
 		Retry retry = method.getAnnotation(Retry.class);
 		int count = 0;
+		Throwable result = new RuntimeException("retry error");
 		while(count<retry.count()){
-			count++;
+			if(count!=0){
+				logger.info("retry:{},method:{},parameters:{}",count,method.getName(),args);
+			}
 			try {
 				return proxy.invokeSuper(obj, args);
 			} catch (Throwable e) {
+				logger.error("error",result = e);
 				List<Class<?>> clazzs = Lists.newArrayList(retry.retException());
-				logger.error("error:",e);
-				if(clazzs.contains(e.getClass())){
-					logger.info("准备重试:{},方法:{},参数:{}",count,method.getName(),args);
-				}else{
+				if(!clazzs.contains(e.getClass())){
 					throw e;
 				}
 			}
+			count++;
 		}
-		return proxy.invokeSuper(obj, args);
+		throw result;
 	}
 
 	/**
@@ -112,7 +114,7 @@ public class TaskInterceptor implements MethodInterceptor{
 				try {
 					proxy.invokeSuper(obj, args);
 				} catch (Throwable e) {
-					e.printStackTrace();
+					logger.error("async method:{} error",method.getName(),e);
 				}
 			}
 		});
@@ -133,7 +135,7 @@ public class TaskInterceptor implements MethodInterceptor{
 			ScheduledFuture<?> futureByName = futures.get(methodName);
 			if(futureByName!=null){
 				futureByName.cancel(false);
-				logger.info("定时任务:{} 停止",methodName);
+				logger.info("TimingTask:{} stop.",methodName);
 			}
 		}
 	}
@@ -148,7 +150,7 @@ public class TaskInterceptor implements MethodInterceptor{
 	 * Object
 	 */
 	private Object timingTask(Object obj, Method method, Object[] args, MethodProxy proxy) {
-		logger.info("定时任务：{} 启动",method.getName());
+		logger.info("TimingTask:{} start.",method.getName());
 		Timing timing = method.getAnnotation(Timing.class);
 		Runnable runnable = new Runnable() {
 			@Override
@@ -183,7 +185,7 @@ public class TaskInterceptor implements MethodInterceptor{
 					singletonMethods.put(method.getName(), false);
 					return true;
 				}
-				logger.error("方法:{} 不允许多次调用",method.getName());
+				logger.error("method:{} multiple calls are not allowed",method.getName());
 				return false;
 			}
 			return true;
