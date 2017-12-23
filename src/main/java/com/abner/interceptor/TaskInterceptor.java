@@ -80,7 +80,7 @@ public class TaskInterceptor implements MethodInterceptor{
 		Retry retry = method.getAnnotation(Retry.class);
 		int count = 0;
 		Throwable result = new RuntimeException("retry error");
-		while(count<retry.count()){
+		while(count<=retry.count()){
 			if(count!=0){
 				logger.info("retry:{},method:{},parameters:{}",count,method.getName(),args);
 			}
