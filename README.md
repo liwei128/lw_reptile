@@ -1,5 +1,5 @@
 # lw_reptile
-仅仅只提供代码部分，需要用到的两个文件夹bin config 见百度云https://pan.baidu.com/s/1qX8GOeo
+仅仅只提供代码部分，需要用到的两个文件夹bin config 见百度云https://pan.baidu.com/s/1ggHqdEF
 
 
 #运行方式（两种）
