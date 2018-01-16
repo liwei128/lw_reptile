@@ -9,17 +9,21 @@ import com.abner.manage.Config;
 public class UserSetting {
 	
 	private  String urls;
+	
+	private  String keywords;
 
 	private  String fileSize;
+	
+	private  int velocity;
 
 	private  String filePath;
 
-	private  Boolean isNowDomain;
+	private  int isNowDomain;
 	
 	private  String emailAddress;
 
 	public String getUrls() {
-		return urls;
+		return urls==null?"":urls;
 	}
 
 	public void setUrls(String urls) {
@@ -28,7 +32,7 @@ public class UserSetting {
 
 
 	public String getFileSize() {
-		return fileSize;
+		return fileSize==null?"":fileSize;
 	}
 
 	public void setFileSize(String fileSize) {
@@ -36,33 +40,50 @@ public class UserSetting {
 	}
 
 	public String getFilePath() {
-		return filePath;
+		return filePath==null?"":filePath;
 	}
 
 	public void setFilePath(String filePath) {
 		this.filePath = filePath;
 	}
 
-	
-	public Boolean getIsNowDomain() {
+	public int getVelocity() {
+		return velocity;
+	}
+
+	public void setVelocity(int velocity) {
+		this.velocity = velocity;
+		Config.setVelocity(velocity);
+	}
+
+	public int getIsNowDomain() {
 		return isNowDomain;
 	}
 
-	public void setIsNowDomain(Boolean isNowDomain) {
+	public void setIsNowDomain(int isNowDomain) {
 		this.isNowDomain = isNowDomain;
 	}
 
 	public String getEmailAddress() {
-		return emailAddress;
+		return emailAddress==null?"":emailAddress;
 	}
 
 	public void setEmailAddress(String emailAddress) {
 		this.emailAddress = emailAddress;
 	}
 
+	public String getKeywords() {
+		return keywords==null?"":keywords;
+	}
+
+	public void setKeywords(String keywords) {
+		this.keywords = keywords;
+	}
+
 	public void toConfig() throws Exception{
-		
 		Config.setURLS(urls);
+		Config.setKeyword(keywords);
+		Config.setVelocity(velocity);
 		Config.setFilePath(filePath);
 		Config.setFileSize(fileSize);
 		Config.setIsNowDomain(isNowDomain);

@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.List;
 
 import com.abner.annotation.Service;
+import com.abner.manage.Config;
 import com.abner.pojo.MyUrl;
 import com.google.common.collect.Lists;
 /**
@@ -57,5 +58,23 @@ public class VerifyService {
 			}
 		}
 		return titles.toString();
+	}
+
+	/**
+	 * 关键字筛选
+	 * @param title
+	 * @return      
+	 * boolean
+	 */
+	public boolean checkKeyword(String title) {
+		if(Config.KEYWORD.size()==0){
+			return true;
+		}
+		for(String keyword:Config.KEYWORD){
+			if(title.contains(keyword)){
+				return true;
+			}
+		}
+		return false;
 	}
 }

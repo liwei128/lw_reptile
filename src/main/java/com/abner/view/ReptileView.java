@@ -19,6 +19,8 @@ public class ReptileView extends AbstractReptileFunction{
 	private Label ping;
 	private Label urls;
 	private Text urlsText;
+	private Label keyword;
+	private Text keywordText;
 	private Label filePath;
 	private Button filePathButton;
 	private Text filePathText;
@@ -154,6 +156,10 @@ public class ReptileView extends AbstractReptileFunction{
 	public Combo getIsNowDomain() {
 		return isNowDomain;
 	}
+	@Override
+	public Text getKeywordText() {
+		return keywordText;
+	}
 
 	public ReptileView() {
 		
@@ -168,7 +174,7 @@ public class ReptileView extends AbstractReptileFunction{
 		 */
 		ping = new Label(shell, SWT.PUSH);
 		ping.setText("ping: 999ms");
-		ping.setLocation(550, 10);
+		ping.setLocation(550, 4);
 		ping.setSize(80, 20);
         
 		/**
@@ -176,27 +182,38 @@ public class ReptileView extends AbstractReptileFunction{
 		 */
 		urls = new Label(shell, SWT.PUSH);
 		urls.setText("网址（多个用英文,隔开）");
-		urls.setLocation(20, 44);
+		urls.setLocation(20, 30);
 		urls.setSize(200, 20);
 		urlsText = new Text(shell, SWT.BORDER);
-		urlsText.setLocation(220, 44);
+		urlsText.setLocation(220, 30);
 		urlsText.setSize(400, 20);
+		
+		/**
+		 * 搜索关键字
+		 */
+		keyword = new Label(shell, SWT.PUSH);
+		keyword.setText("搜索关键字（英文,隔开）");
+		keyword.setLocation(20, 64);
+		keyword.setSize(200, 20);
+		keywordText = new Text(shell, SWT.BORDER);
+		keywordText.setLocation(220, 64);
+		keywordText.setSize(400, 20);
 		
 		/**
 		 * 图片保存路径
 		 */
 		filePath = new Label(shell, SWT.PUSH);
 		filePath.setText("图片保存路径");
-		filePath.setLocation(20, 80);
+		filePath.setLocation(20, 98);
 		filePath.setSize(170, 20);
 		
 		filePathButton = new Button(shell, SWT.PUSH);
-		filePathButton.setLocation(570, 79);
+		filePathButton.setLocation(570, 98);
 		filePathButton.setSize(50, 22);
 		filePathButton.setText("请选择");
 		
 		filePathText = new Text(shell, SWT.BORDER);
-		filePathText.setLocation(220, 80);
+		filePathText.setLocation(220, 99);
 		filePathText.setSize(400, 20);
 		
 		/**
@@ -204,11 +221,11 @@ public class ReptileView extends AbstractReptileFunction{
 		 */
 		fileSize = new Label(shell, SWT.PUSH);
 		fileSize.setText("最小文件限制（kb）");
-		fileSize.setLocation(20, 116);
+		fileSize.setLocation(20, 132);
 		fileSize.setSize(200, 20);
 
 		fileSizeText = new Text(shell, SWT.BORDER);
-		fileSizeText.setLocation(220, 116);
+		fileSizeText.setLocation(220, 132);
 		fileSizeText.setSize(400, 20);
 		
 		/**
@@ -216,11 +233,11 @@ public class ReptileView extends AbstractReptileFunction{
 		 */
         emailAddress = new Label(shell, SWT.PUSH);
         emailAddress.setText("通知邮件地址:");
-        emailAddress.setLocation(20, 152);
+        emailAddress.setLocation(20, 166);
         emailAddress.setSize(200, 20);
         
         emailAddressText = new Text(shell, SWT.BORDER);
-        emailAddressText.setLocation(220, 152);
+        emailAddressText.setLocation(220, 166);
         emailAddressText.setSize(400, 20);
 
         /**
@@ -238,12 +255,12 @@ public class ReptileView extends AbstractReptileFunction{
         velocity.setData("3", 4);
         velocity.setData("4", 5);
         velocity.select(0);
-        velocity.setLocation(80,190);
+        velocity.setLocation(80,200);
         velocity.setSize(100, 20);
         
         velocityLable = new Label(shell, SWT.PUSH);
         velocityLable.setText("爬虫速度:");
-        velocityLable.setLocation(20, 193);
+        velocityLable.setLocation(20, 203);
         velocityLable.setSize(60, 20);
         
         /**
@@ -255,12 +272,12 @@ public class ReptileView extends AbstractReptileFunction{
         isNowDomain.setData("0", true);
         isNowDomain.setData("1", false);
         isNowDomain.select(0);
-        isNowDomain.setLocation(300,190);
+        isNowDomain.setLocation(300,200);
         isNowDomain.setSize(100, 20);
         
         isNowDomainLable = new Label(shell, SWT.PUSH);
         isNowDomainLable.setText("是否指定域名:");
-        isNowDomainLable.setLocation(220, 193);
+        isNowDomainLable.setLocation(220, 203);
         isNowDomainLable.setSize(80, 20);
         
         /**
@@ -276,24 +293,13 @@ public class ReptileView extends AbstractReptileFunction{
         combo.setData("2", 30);
         combo.setData("3", 10);
         combo.select(0);
-        combo.setLocation(520,190);
+        combo.setLocation(520,200);
         combo.setSize(100, 20);
         
         comboLable = new Label(shell, SWT.PUSH);
         comboLable.setText("监控时间段:");
-        comboLable.setLocation(450, 193);
+        comboLable.setLocation(450, 203);
         comboLable.setSize(70, 20);
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
         
 
         /**
@@ -301,82 +307,82 @@ public class ReptileView extends AbstractReptileFunction{
          */
         sumUrl = new Label(shell, SWT.PUSH);
         sumUrl.setText("探测到链接数:");
-        sumUrl.setLocation(20, 235);
+        sumUrl.setLocation(20, 236);
         sumUrl.setSize(80, 20);
         
         sumUrlText = new Label(shell, SWT.PUSH);
         sumUrlText.setText("0");
-        sumUrlText.setLocation(100, 235);
+        sumUrlText.setLocation(100, 236);
         sumUrlText.setSize(80, 20);
         
         doneUrl = new Label(shell, SWT.PUSH);
         doneUrl.setText("抓取链接数:");
-        doneUrl.setLocation(180, 235);
+        doneUrl.setLocation(180, 236);
         doneUrl.setSize(80, 20);
         
         doneUrlText = new Label(shell, SWT.PUSH);
         doneUrlText.setText("0");
-        doneUrlText.setLocation(260, 235);
+        doneUrlText.setLocation(260, 236);
         doneUrlText.setSize(80, 20);
         
         failUrl = new Label(shell, SWT.PUSH);
         failUrl.setText("失败链接数:");
-        failUrl.setLocation(340, 235);
+        failUrl.setLocation(340, 236);
         failUrl.setSize(80, 20);
         
         failUrlText = new Label(shell, SWT.PUSH);
         failUrlText.setText("0");
-        failUrlText.setLocation(420, 235);
+        failUrlText.setLocation(420, 236);
         failUrlText.setSize(80, 20);
         
         urlRate = new Label(shell, SWT.PUSH);
         urlRate.setText("链接失败率:");
-        urlRate.setLocation(500, 235);
+        urlRate.setLocation(500, 236);
         urlRate.setSize(80, 20);
         
         urlRateText = new Label(shell, SWT.PUSH);
         urlRateText.setText("");
-        urlRateText.setLocation(580, 235);
+        urlRateText.setLocation(580, 236);
         urlRateText.setSize(80, 20);
         
         sumImg = new Label(shell, SWT.PUSH);
         sumImg.setText("探测到图片数:");
-        sumImg.setLocation(20, 270);
+        sumImg.setLocation(20, 266);
         sumImg.setSize(80, 20);
         
         sumImgText = new Label(shell, SWT.PUSH);
         sumImgText.setText("0");
-        sumImgText.setLocation(100, 270);
+        sumImgText.setLocation(100, 266);
         sumImgText.setSize(80, 20);
         
         doneImg = new Label(shell, SWT.PUSH);
         doneImg.setText("下载图片数:");
-        doneImg.setLocation(180, 270);
+        doneImg.setLocation(180, 266);
         doneImg.setSize(80, 20);
         
         doneImgText = new Label(shell, SWT.PUSH);
         doneImgText.setText("0");
-        doneImgText.setLocation(260, 270);
+        doneImgText.setLocation(260, 266);
         doneImgText.setSize(80, 20);
         
         failImg = new Label(shell, SWT.PUSH);
         failImg.setText("失败图片数:");
-        failImg.setLocation(340, 270);
+        failImg.setLocation(340, 266);
         failImg.setSize(80, 20);
         
         failImgText = new Label(shell, SWT.PUSH);
         failImgText.setText("0");
-        failImgText.setLocation(420, 270);
+        failImgText.setLocation(420, 266);
         failImgText.setSize(80, 20);
         
         imgRate = new Label(shell, SWT.PUSH);
         imgRate.setText("下载失败率:");
-        imgRate.setLocation(500, 270);
+        imgRate.setLocation(500, 266);
         imgRate.setSize(80, 20);
         
         imgRateText = new Label(shell, SWT.PUSH);
         imgRateText.setText("");
-        imgRateText.setLocation(580, 270);
+        imgRateText.setLocation(580, 266);
         imgRateText.setSize(80, 20);
       
 		
