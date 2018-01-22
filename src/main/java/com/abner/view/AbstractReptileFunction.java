@@ -62,6 +62,7 @@ public abstract class AbstractReptileFunction {
 	public abstract Label getFailImgText();
 	public abstract Label getImgRateText();
 	public abstract Text getEmailAddressText();
+	public abstract Text getKeywordText();
 	
 	//开始按钮
 	public SelectionAdapter getStartFunction(){
@@ -128,6 +129,7 @@ public abstract class AbstractReptileFunction {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if(verifyMsg("确认要退出吗")==SWT.YES){
+					reptileController.saveUserSetting();
 					reptileController.saveAddress();
 					System.exit(0);
 				}
@@ -162,7 +164,7 @@ public abstract class AbstractReptileFunction {
 		     @Override
 		     public void widgetSelected(SelectionEvent e) {
 		    	 int index = getVelocity().getSelectionIndex();
-			     Config.velocity = index+1;
+			     Config.userSetting.setVelocity(index);
 		     }
 	    };
 	}
@@ -173,6 +175,7 @@ public abstract class AbstractReptileFunction {
 			@Override
 	        public void shellClosed(ShellEvent e) {
 	        	if(e.doit=verifyMsg("确认要退出吗")==SWT.YES){
+	        		reptileController.saveUserSetting();
 					reptileController.saveAddress();
 					System.exit(0);
 				}
@@ -287,12 +290,13 @@ public abstract class AbstractReptileFunction {
 	
 	
 	private void setViewSetting() {
-		getUrlsText().setText(Config.getUrlStr());
-		getVelocity().select(Config.velocity-1);
-		getFileSizeText().setText(Integer.toString(Config.fileSize));
-		getFilePathText().setText(Config.filePath);
-		getIsNowDomain().select(Config.isNowDomain?0:1);
-		getEmailAddressText().setText(Config.emailAddress==null?"":Config.emailAddress);
+		getUrlsText().setText(Config.userSetting.getUrls());
+		getKeywordText().setText(Config.userSetting.getKeywords());
+		getVelocity().select(Config.userSetting.getVelocity());
+		getFileSizeText().setText(Config.userSetting.getFileSize());
+		getFilePathText().setText(Config.userSetting.getFilePath());
+		getIsNowDomain().select(Config.userSetting.getIsNowDomain());
+		getEmailAddressText().setText(Config.userSetting.getEmailAddress());
 		
 	}
 	
@@ -304,6 +308,7 @@ public abstract class AbstractReptileFunction {
 		getUrlsText().setEditable(isFinish);
 		getFilePathText().setEditable(isFinish);
 		getFileSizeText().setEditable(isFinish);
+		getKeywordText().setEditable(isFinish);
 		getIsNowDomain().setEnabled(isFinish);
 		getEmailAddressText().setEditable(isFinish);
 	}
@@ -313,8 +318,10 @@ public abstract class AbstractReptileFunction {
 		UserSetting userSetting = new UserSetting();
 		userSetting.setUrls(getUrlsText().getText().trim());
 		userSetting.setFilePath(getFilePathText().getText().trim());
+		userSetting.setKeywords(getKeywordText().getText().trim());
 		userSetting.setFileSize(getFileSizeText().getText().trim());
-		userSetting.setIsNowDomain(getIsNowDomain().getSelectionIndex()==0);
+		userSetting.setIsNowDomain(getIsNowDomain().getSelectionIndex());
+		userSetting.setVelocity(getVelocity().getSelectionIndex());
 		userSetting.setEmailAddress(getEmailAddressText().getText().trim());
 		userSetting.toConfig();
 	}

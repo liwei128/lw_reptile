@@ -80,8 +80,11 @@ public class MyUrl{
 
 	@Override
 	public boolean equals(Object obj) {
-		MyUrl o=(MyUrl) obj;
-		return this.url.equals(o.getUrl());
+		if(obj instanceof MyUrl){
+			MyUrl o=(MyUrl) obj;
+			return this.url.equals(o.getUrl());
+		}
+		return false;
 	}
 	
 }

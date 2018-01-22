@@ -5,7 +5,6 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-
 import com.abner.annotation.Resource;
 import com.abner.annotation.Service;
 import com.abner.db.MonitorDataStorage;
@@ -22,7 +21,7 @@ import com.abner.pojo.MyUrl;
  */
 @Service
 public class ParseHtmlService {
-	
+		
 	@Resource
 	private VerifyService verifyService;
 
@@ -60,7 +59,7 @@ public class ParseHtmlService {
 			   if(add) {num++;};
 		   }
 		} 
-		MonitorDataStorage.record(MonitorName.SUMIMG.name(),num);
+		MonitorDataStorage.record(MonitorName.SUMURL.name(),num);
 	}
 
 	/**
@@ -73,6 +72,9 @@ public class ParseHtmlService {
 		Document doc = Jsoup.parse(html);
 		String title = doc.head().select("title").text();
 		title = verifyService.checkTitle(title.trim());
+		if(!verifyService.checkKeyword(title)){
+			return;
+		}
 		Elements imgs = doc.select("img[src]");
 		int num=0;
 		for(Element img:imgs){
@@ -82,7 +84,7 @@ public class ParseHtmlService {
 				if(add){ num++;};
 			}
 		}
-		MonitorDataStorage.record(MonitorName.SUMURL.name(),num);
+		MonitorDataStorage.record(MonitorName.SUMIMG.name(),num);
 	}
 	
 
