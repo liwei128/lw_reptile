@@ -42,6 +42,7 @@ public class ReptileController {
 	private MonitorNetworkService monitorNetworkService;
 	
 	@Singleton
+
 	public void init() {
 		logService.readLogs();
 		monitorNetworkService.monitorNetwork();
@@ -98,5 +99,8 @@ public class ReptileController {
 	public double calculateRate(Long doneUrl, Long failUrl) {
 		return commonService.calculateRate(doneUrl, failUrl);
 	}
-	
+
+
+
+
 }
