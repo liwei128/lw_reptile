@@ -8,5 +8,7 @@ public class Client {
 	public static void main(String[] args) {
 		//开启视图
 		new ReptileView();
+
 	}
+
 }

@@ -43,23 +43,13 @@ public class MyThreadPool {
 	/**
 	 * 线程创建策略
 	 */
-	private static ThreadFactory threadFactory = new ThreadFactory() {
-		
-		@Override
-		public Thread newThread(Runnable r) {
-			return new Thread(r);
-		}
-	};
+	private static ThreadFactory threadFactory = Thread::new;
 	/**
 	 * 提交任务失败时（如超过maximumPoolSize），处理策略
 	 */
-	private static RejectedExecutionHandler rejectedHandler = new RejectedExecutionHandler(){
-		@Override
-		public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {	
-			logger.info("线程数超过线程池允许最大线程数");
-		}
-	};
-	
+	private static RejectedExecutionHandler rejectedHandler =
+			(r, executor) -> logger.info("线程数超过线程池允许最大线程数");
+
 	/**
 	 * 线程池的创建
 	 */

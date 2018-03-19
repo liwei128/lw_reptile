@@ -32,7 +32,7 @@ public class TaskInterceptor implements MethodInterceptor{
 	private Map<String,Boolean> singletonMethods = Maps.newHashMap();
 	
 	private Map<String,ScheduledFuture<?>> futures = Maps.newHashMap();
-	
+
 	@Override
 	public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
 		
@@ -109,16 +109,13 @@ public class TaskInterceptor implements MethodInterceptor{
 	 * Object
 	 */
 	private Object asyncTask(Object obj, Method method, Object[] args, MethodProxy proxy) {
-		MyThreadPool.execute(new Runnable() {
-			@Override
-			public void run() {
-				try {
-					proxy.invokeSuper(obj, args);
-				} catch (Throwable e) {
-					logger.error("异步方法 :{} 发生错误:{}",method.getName(),e.getMessage());
-				}
-			}
-		});
+		MyThreadPool.execute(() -> {
+            try {
+                proxy.invokeSuper(obj, args);
+            } catch (Throwable e) {
+                logger.error("异步方法 :{} 发生错误:{}",method.getName(),e.getMessage());
+            }
+        });
 		return null;
 	}
 
@@ -153,16 +150,13 @@ public class TaskInterceptor implements MethodInterceptor{
 	private Object timingTask(Object obj, Method method, Object[] args, MethodProxy proxy) {
 		logger.info("定时任务:{} 开始.",method.getName());
 		Timing timing = method.getAnnotation(Timing.class);
-		Runnable runnable = new Runnable() {
-			@Override
-			public void run() {
-				try {
-					proxy.invokeSuper(obj, args);
-				} catch (Throwable e) {
-					logger.error("定时任务:{} 发生错误:{}",method.getName(),e.getMessage());
-				}
-			}
-		};
+		Runnable runnable = () -> {
+            try {
+                proxy.invokeSuper(obj, args);
+            } catch (Throwable e) {
+                logger.error("定时任务:{} 发生错误:{}",method.getName(),e.getMessage());
+            }
+        };
 		ScheduledFuture<?> future = null;
 		if(timing.type() == TimingType.FIXED_DELAY){
 			future = MyThreadPool.scheduleWithFixedDelay(runnable, timing.initialDelay(), timing.period(), timing.unit());
