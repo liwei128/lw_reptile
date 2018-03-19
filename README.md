@@ -1,5 +1,5 @@
 # lw_reptile
-仅仅只提供代码部分，需要用到的两个文件夹bin config 见百度云链接：https://pan.baidu.com/s/1o9jmgGE 密码：4ukm
+仅仅只提供代码部分，打包好的可运行程序见https://github.com/liwei128/reptile.run.git
 
 
 #运行方式（两种）
