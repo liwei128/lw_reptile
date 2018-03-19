@@ -60,8 +60,7 @@ public class MyThreadPool {
 	 * 定时任务线程池创建
 	 */
 	private static ScheduledExecutorService scheduledthreadService = new ScheduledThreadPoolExecutor(5, threadFactory,rejectedHandler);
-	
-	
+
 	/**
 	 * 执行任务
 	 * @param runnable      

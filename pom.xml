@@ -87,7 +87,13 @@
 		<dependency>
 		    <groupId>org.reflections</groupId>
 		    <artifactId>reflections</artifactId>
-		    <version>0.9.8</version>
+		    <version>0.9.10</version>
+		    <exclusions>
+		        <exclusion>
+		            <groupId>javassist</groupId>
+		            <artifactId>javassist</artifactId>
+		        </exclusion>
+    		</exclusions>
 		</dependency>
 		<!-- cglib动态代理 -->
 		<dependency>
