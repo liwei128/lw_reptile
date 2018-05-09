@@ -37,7 +37,7 @@ public class LoadImgService{
 	@Resource
 	private VerifyService verifyService;
 	
-	@Timing(initialDelay = 0, period = 5, type = TimingType.FIXED_RATE, unit = TimeUnit.SECONDS)
+	@Timing(initialDelay = 0, period = 4, type = TimingType.FIXED_RATE, unit = TimeUnit.SECONDS)
 	public void loadImg() {
 		if(StatusManage.ping==0){
 			return;
