@@ -1,5 +1,6 @@
 package com.abner.manage;
 
+import java.util.Date;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ScheduledExecutorService;
@@ -96,6 +97,17 @@ public class MyThreadPool {
 	public static ScheduledFuture<?> scheduleWithFixedDelay(Runnable command,long initialDelay,long delay,TimeUnit unit){
 		return scheduledthreadService.scheduleWithFixedDelay(command, initialDelay, delay, unit);
 	}
+	/**
+	 * 固定时间执行一次
+	 * @param command
+	 * @param delay
+	 * @param unit
+	 */
+	public static ScheduledFuture<?> schedule(Runnable command , Date date){
+		long time = date.getTime()-System.currentTimeMillis();
+		return scheduledthreadService.schedule(command,time,TimeUnit.MILLISECONDS);
+	}
+	
 	
 
 

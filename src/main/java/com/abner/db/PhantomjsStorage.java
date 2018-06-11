@@ -25,7 +25,7 @@ public class PhantomjsStorage {
 		for(int i=0;i<phantomjsProcessess.size();i++){
 			PhantomjsProcesses p = phantomjsProcessess.get(i);
 			long time =p.getTime();
-			if(p.isAlive()&&time>100*1000){
+			if(p.isAlive()&&time>60*1000){
 				logger.error("phantomjs进程懵逼, 懵逼时长:{}ms",time);
 				p.destroy();
 				logger.info("成功清理假死phantomjs进程");

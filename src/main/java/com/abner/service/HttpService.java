@@ -97,10 +97,10 @@ public class HttpService {
 	 * String
 	 */
 	@Retry(count = 1, retException = { GetUrlException.class })
-	public String get(String url){
+	public String get(String jsPath,String url){
 		Process p=null;
 		try {
-			p= Runtime.getRuntime().exec(FilePathManage.exe+" " +FilePathManage.js+" "+url);
+			p= Runtime.getRuntime().exec(FilePathManage.exe+" " +jsPath+" "+url);
 			PhantomjsStorage.add(p);
 			InputStream is = p.getInputStream(); 
 			BufferedReader br = new BufferedReader(new InputStreamReader(is,"UTF-8")); 
@@ -123,7 +123,6 @@ public class HttpService {
 			if(p!=null){
 				p.destroy();
 			}
-				
 		}		
 	}
 	
@@ -203,4 +202,5 @@ public class HttpService {
         //session.setDebug(true);
 		return session;
 	}
+	
 }

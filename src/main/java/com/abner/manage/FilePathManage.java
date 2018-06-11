@@ -14,6 +14,12 @@ public class FilePathManage {
 	
 	public static String js = binPath + File.separator + "page.js";
 	
+	public static String loginJs = binPath + File.separator + "login.js";
+	
+	public static String buyGoodsJs = binPath + File.separator + "buyGoods.js";
+	
+	public static String checkLoginStatusJs = binPath + File.separator + "checkLoginStatus.js";
+	
 	public static String exe = binPath + File.separator  + "phantomjs.exe"; 
 	
 	public static String exeBackups=configPath + File.separator  + "phantomjs.exe"; 
@@ -23,4 +29,6 @@ public class FilePathManage {
 	public static String imgUrls=configPath + File.separator + "imgUrls.json";
 	
 	public static String userSetting=configPath + File.separator + "user.setting";
+	
+	public static String miConfig = configPath + File.separator + "mi.json";
 }

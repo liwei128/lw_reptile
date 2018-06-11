@@ -60,7 +60,6 @@ public class FileUtil {
             fileInputStream.close();
         } catch (IOException e) {
             logger.error("读取文件内容错误",e);
-            e.printStackTrace();
         }
         return fileContent.toString();
     }
