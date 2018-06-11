@@ -102,13 +102,14 @@ public class XiaoMiService {
 	public boolean buyGoods() {
 		XiaoMiDto xiaomi = XiaoMiController.XIAOMI;
 		String result = httpService.get(FilePathManage.buyGoodsJs, "");
-		if("success".equals(result)){
+		if(result.length()!=0){
 			XiaoMiController.submitCount++;
-			logger.info("sumbit success!{},count:{}",xiaomi.getGoodsInfo().getUrl(),XiaoMiController.submitCount);
+			logger.info("{},url:{},count:{}",result,xiaomi.getGoodsInfo().getUrl(),XiaoMiController.submitCount);
 			return true;
 		}
 		return false;
 	}
+	
 	@Timing(initialDelay = 0, period = 4, type = TimingType.FIXED_RATE, unit = TimeUnit.SECONDS)
 	public void buyGoods(int count) {
 		for(int i = 0;i<count;i++){
