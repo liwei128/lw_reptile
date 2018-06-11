@@ -1,26 +1,22 @@
 package com.abner.service;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.abner.annotation.Async;
 import com.abner.annotation.Resource;
 import com.abner.annotation.Service;
+import com.abner.annotation.Singleton;
 import com.abner.annotation.Timing;
-import com.abner.controller.XiaoMiController;
 import com.abner.enums.TimingType;
 import com.abner.manage.FilePathManage;
 import com.abner.manage.MyThreadPool;
+import com.abner.manage.mi.Config;
 import com.abner.pojo.mi.Cookie;
-import com.abner.pojo.mi.CustomRule;
-import com.abner.pojo.mi.XiaoMiDto;
+import com.abner.pojo.mi.User;
 import com.abner.utils.FileUtil;
 import com.abner.utils.JsonUtil;
 
@@ -43,92 +39,106 @@ public class XiaoMiService {
 	
 	
 	public boolean islogin(){
-		XiaoMiDto xiaomi = XiaoMiController.XIAOMI;
-		String miString = FileUtil.readFileToString(FilePathManage.miConfig);
-		if(miString==null||miString.length()==0){
+		try{
+			String miString = FileUtil.readFileToString(FilePathManage.userConfig);
+			if(miString==null||miString.length()==0){
+				return false;
+			}
+			User oldUser = JsonUtil.toBean(miString, User.class);
+			if(oldUser==null){
+				return false;
+			}
+			if(!oldUser.equals(Config.user)){
+				return false;
+			}
+			if(oldUser.getCookies()==null||oldUser.getCookies().size()==0){
+				return false;
+			}
+			String result = httpService.getNoRetry(FilePathManage.checkLoginStatusJs, "");
+			if(result.equals("true")){
+				return true;
+			}
 			return false;
+		}catch(Exception e){
+			logger.info("验证登录异常");
 		}
-		XiaoMiDto oldXiaomi = JsonUtil.toBean(miString, XiaoMiDto.class);
-		if(oldXiaomi==null){
-			return false;
-		}
-		if(!xiaomi.getUser().equals(oldXiaomi.getUser())){
-			return false;
-		}
-		if(oldXiaomi.getUser().getCookies()==null||oldXiaomi.getUser().getCookies().size()==0){
-			return false;
-		}
-		String result = httpService.get(FilePathManage.checkLoginStatusJs, "");
-		if(result.length()==0||result.equals("false")){
-			return false;
-		}
-		return true;
+		return false;
+		
 
 	}
+	
 	/**
 	 * 保持登录状态
 	 */
-	@Timing(initialDelay = 10, period = 10, type = TimingType.FIXED_RATE, unit = TimeUnit.MINUTES)
-	public void keepLoginStatus(){
-		if(!islogin()){
-			login();
-			return;
-		}
-		logger.info("{} login status ok!",XiaoMiController.XIAOMI.getUser().getUserName());
-	}
-	
+	@Timing(initialDelay = 0, period = 10, type = TimingType.FIXED_RATE, unit = TimeUnit.MINUTES)
 	public void login() {
-		XiaoMiDto xiaomi = XiaoMiController.XIAOMI;
-		logger.info("start login：{}",xiaomi.getUser().getUserName());
+		if(islogin()){
+			logger.info("用户:{} 已登录。",Config.user.getUserName());
+			return ;
+		}
 		long start = System.currentTimeMillis();
-		FileUtil.writeToFile(JsonUtil.toString(xiaomi), FilePathManage.miConfig);
+		FileUtil.writeToFile(JsonUtil.toString(Config.user), FilePathManage.userConfig);
 		String result = "";
 		int loginCount = 0;
 		while(result.length()==0||result.equals("false")){
 			loginCount++;
 			try{
-				result = httpService.get(FilePathManage.loginJs, "");
+				result = httpService.getNoRetry(FilePathManage.loginJs, "");
 			}catch(Exception e){
-				logger.error("xiaomi login fail:{}",loginCount);
+				logger.error("用户登录失败:{},正准备重试。。。",loginCount);
 			}
 		}
 		List<Cookie> cookies = JsonUtil.toList(result, Cookie.class);
-		xiaomi.getUser().setCookies(cookies);
-		FileUtil.writeToFile(JsonUtil.toString(xiaomi), FilePathManage.miConfig);
-		logger.info("xiaomi login success:{},time:{}ms",xiaomi.getUser().getUserName(),System.currentTimeMillis()-start);
+		Config.user.setCookies(cookies);
+		FileUtil.writeToFile(JsonUtil.toString(Config.user), FilePathManage.userConfig);
+		logger.info("用户:{} 登录成功,时间:{}ms",Config.user.getUserName(),System.currentTimeMillis()-start);
+	}
+	/**
+	 * 获取购买链接
+	 */
+	public void getBuyUrl(){
+		List<String> buyUrl = null;
+		while(buyUrl==null||buyUrl.size()==0){
+			String result = httpService.getNoRetry(FilePathManage.buyGoodsJs, "");
+			buyUrl = JsonUtil.toList(result, String.class);
+			if(buyUrl==null||buyUrl.isEmpty()){
+				logger.info("未发现购买按钮");
+			}
+		}
+		logger.info("购买链接:{}",buyUrl);
+		String miString = FileUtil.readFileToString(FilePathManage.userConfig);
+		User user = JsonUtil.toBean(miString, User.class);
+		buyGoodsForHttp(buyUrl,user.getCookies());
 	}
 	
-	@Async
-	public boolean buyGoods() {
-		XiaoMiDto xiaomi = XiaoMiController.XIAOMI;
-		String result = httpService.get(FilePathManage.buyGoodsJs, "");
-		if(result.length()!=0){
-			XiaoMiController.submitCount++;
-			logger.info("{},url:{},count:{}",result,xiaomi.getGoodsInfo().getUrl(),XiaoMiController.submitCount);
-			return true;
+	@Singleton
+	@Timing(initialDelay = 0, period = 5, type = TimingType.FIXED_RATE, unit = TimeUnit.SECONDS)
+	public void buyGoodsForHttp(List<String> buyUrl,List<Cookie> cookies) {
+		for(int i =0;i<Config.customRule.getCount();i++){
+			for(String url:buyUrl){
+				long start = System.currentTimeMillis();
+				String re = httpService.getForHttp(url, cookies);
+				if(re!=null){
+					Config.submitCount.addAndGet(1);
+					logger.info("提交成功({}),看人品咯！{}ms,{}    {}",Config.submitCount.toString(),System.currentTimeMillis()-start,url,re);
+				}
+			}
 		}
-		return false;
-	}
-	
-	@Timing(initialDelay = 0, period = 4, type = TimingType.FIXED_RATE, unit = TimeUnit.SECONDS)
-	public void buyGoods(int count) {
-		for(int i = 0;i<count;i++){
-			buyGoods();
-		}
+		
 	}
 	
 	
-	public void start() throws ParseException {
-
-		CustomRule customRule = XiaoMiController.XIAOMI.getCustomRule();
-		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		Date date = simpleDateFormat.parse(customRule.getDate());
-		if(!islogin()){
-			login();
-		}
+	public void start(){
+		//登录
 		MyThreadPool.schedule(()->{
-			buyGoods(customRule.getCount());
-		}, date);
+			logger.info("购买前2分钟,开始登录...");
+			login();
+		}, Config.customRule.getLoginTime(), TimeUnit.MILLISECONDS);
+		//购买
+		MyThreadPool.schedule(()->{
+			FileUtil.writeToFile(JsonUtil.toString(Config.goodsInfo), FilePathManage.goodsInfoConfig);
+			getBuyUrl();
+		}, Config.customRule.getBuyTime(), TimeUnit.MILLISECONDS);
 		
 	}
 

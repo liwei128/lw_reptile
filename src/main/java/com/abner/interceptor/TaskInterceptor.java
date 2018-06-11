@@ -66,6 +66,7 @@ public class TaskInterceptor implements MethodInterceptor{
 		
 	}
 
+
 	/**
 	 * 重试方法
 	 * @param obj

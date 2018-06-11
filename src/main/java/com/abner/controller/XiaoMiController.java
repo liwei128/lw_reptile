@@ -3,12 +3,15 @@ package com.abner.controller;
 
 import java.text.ParseException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.abner.annotation.Controller;
 import com.abner.annotation.Resource;
+import com.abner.manage.mi.Config;
 import com.abner.pojo.mi.CustomRule;
 import com.abner.pojo.mi.GoodsInfo;
 import com.abner.pojo.mi.User;
-import com.abner.pojo.mi.XiaoMiDto;
 import com.abner.service.LoadUrlsService;
 import com.abner.service.XiaoMiService;
 import com.google.common.collect.Lists;
@@ -22,9 +25,7 @@ import com.google.common.collect.Lists;
 @Controller
 public class XiaoMiController {
 	
-	public static final XiaoMiDto XIAOMI = XiaoMiDto.build(); 
-	
-	public static int submitCount = 0;
+	private static  Logger logger = LoggerFactory.getLogger(XiaoMiController.class);
 	
 	@Resource
 	private XiaoMiService xiaomiService;
@@ -34,32 +35,43 @@ public class XiaoMiController {
 	
 	
 	public void start() throws ParseException{
-			XIAOMI.buildUser(buildUser())
-				.buildGoodsInfo(buildGoodsInfo())
-				.buildCustomRule(buildCustomRule());
-			loadUrlsService.cleanPhantomjs();
-			xiaomiService.keepLoginStatus();
-			xiaomiService.start();
+		if(buildParam()){
+			
+		}
+		loadUrlsService.cleanPhantomjs();
+		xiaomiService.start();
 	}
 	
-	private CustomRule buildCustomRule() {
-		CustomRule customRule = new CustomRule();
-		customRule.setCount(6);
-		customRule.setDate("2018-06-11 16:35:00");
-		return customRule;
+	public boolean buildParam(){
+		buildUser();
+		buildGoodsInfo();
+		return buildCustomRule();
+	}
+	private boolean buildCustomRule(){
+		Config.customRule = new CustomRule();
+		Config.customRule.setCount(10);
+		try{
+			Config.customRule.builderTime("2018-06-11 22:56:00");
+			if(Config.customRule.getLoginTime()<0){
+				logger.error("时间不合法");
+				return false;
+			}
+		}catch(Exception e){
+			logger.error("时间不合法");
+			return false;
+		}
+		return true;
 	}
 
-	private User buildUser() {
-		User user = new User();
-		user.setUserName("18576462480");
-		user.setPassword("342117wacx");
-		return user;
+	private void buildUser() {
+		Config.user = new User();
+		Config.user.setUserName("18576462480");
+		Config.user.setPassword("342117wacx");
 	}
 
-	private GoodsInfo buildGoodsInfo() {
-		GoodsInfo goodsInfo = new GoodsInfo();
-		goodsInfo.setUrl("https://item.mi.com/product/10000093.html");
-		goodsInfo.setParams_index(Lists.newArrayList(0));
-		return goodsInfo;
+	private void buildGoodsInfo() {
+		Config.goodsInfo = new GoodsInfo();
+		Config.goodsInfo.setUrl("https://item.mi.com/product/10000057.html");
+		Config.goodsInfo.setParams_index(Lists.newArrayList(1,0));
 	}
 }

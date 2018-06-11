@@ -8,19 +8,26 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Date;
+import java.util.List;
 import java.util.Properties;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+
+import org.apache.http.HttpEntity;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.params.CookiePolicy;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.DefaultConnectionKeepAliveStrategy;
 import org.apache.http.impl.client.DefaultRedirectStrategy;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.cookie.BasicClientCookie;
+import org.apache.http.message.BasicHeader;
+import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +42,7 @@ import com.abner.exception.GetUrlException;
 import com.abner.manage.Config;
 import com.abner.manage.FilePathManage;
 import com.abner.pojo.FileDownloadDto;
+import com.abner.pojo.mi.Cookie;
 import com.abner.utils.FileUtil;
 
 /**
@@ -98,6 +106,10 @@ public class HttpService {
 	 */
 	@Retry(count = 1, retException = { GetUrlException.class })
 	public String get(String jsPath,String url){
+		return getNoRetry(jsPath, url);
+	}
+	
+	public String getNoRetry(String jsPath,String url){
 		Process p=null;
 		try {
 			p= Runtime.getRuntime().exec(FilePathManage.exe+" " +jsPath+" "+url);
@@ -125,7 +137,60 @@ public class HttpService {
 			}
 		}		
 	}
+	/**
+	 * http请求携带cookies
+	 * @param url
+	 * @param cookies
+	 * @return
+	 */
+	public String getForHttp(String url,List<Cookie> cookies){
+		CloseableHttpClient httpClient = createCookiesHttpClient(cookies);
+    	CloseableHttpResponse response=null;
+		try{
+    		HttpGet httpGet = new HttpGet(url);
+    		
+    		httpGet.addHeader(new BasicHeader("Cookie",builderCookiesStr(cookies)));
+    		httpGet.setHeader("Host", "cart.mi.com");
+    		httpGet.setHeader("Connection", "keep-alive");
+       		httpGet.setHeader("User-Agent", "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Mobile Safari/537.36");
+            response = httpClient.execute(httpGet);
+            return toString(response);
+            
+		}catch(Exception e){
+			logger.info("链接:"+url+"异常");
+			return null;
+    	}finally{
+    		closeStream(response,httpClient);
+    	}
+	}
 	
+	private String builderCookiesStr(List<Cookie> cookies) {
+		StringBuilder str = new StringBuilder();
+		cookies.forEach(o->{
+			str.append(o.getName()).append(":").append(o.getValue()).append(";");
+		});
+		return str.toString();
+	}
+	private CloseableHttpClient createCookiesHttpClient(List<Cookie> cookies) {
+		// 配置超时时间（连接服务端超时60s，请求数据返回超时60s）  
+		RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(60000).setSocketTimeout(60000)  
+                       .setConnectionRequestTimeout(60000).build();
+		BasicCookieStore cookieStore = new BasicCookieStore();
+		for(Cookie cookie:cookies){
+			BasicClientCookie bcookie = new BasicClientCookie(cookie.getName(), cookie.getValue()); 
+			bcookie.setDomain(cookie.getDomain());
+			bcookie.setPath(cookie.getPath());
+			bcookie.setVersion(0);
+			bcookie.setExpiryDate(new Date(System.currentTimeMillis()+60*60*1000));
+			cookieStore.addCookie(bcookie);
+		}
+        // 设置默认跳转以及存储cookie  
+        CloseableHttpClient httpClient = HttpClientBuilder.create()  
+                     .setKeepAliveStrategy(new DefaultConnectionKeepAliveStrategy())  
+                     .setRedirectStrategy(new DefaultRedirectStrategy()).setDefaultRequestConfig(requestConfig)  
+                     .setDefaultCookieStore(cookieStore).build(); 
+		return httpClient;
+	}
 	/**
 	 * 发送邮件
 	 * @param address
@@ -202,5 +267,22 @@ public class HttpService {
         //session.setDebug(true);
 		return session;
 	}
+	
+	public static String toString(CloseableHttpResponse httpResponse){  
+        // 获取响应消息实体  
+    	try{
+        	int statusCode = httpResponse.getStatusLine().getStatusCode();
+        	if(statusCode!=200){
+	        	logger.error("状态值:{}",statusCode); 
+        		return null;
+        	}
+    		HttpEntity entity = httpResponse.getEntity();
+            return EntityUtils.toString(entity,"utf-8");  
+    	}catch(Exception e){
+    		logger.error("http返回数据转字符出现异常");  
+    	}
+    	return null;
+        
+    }  
 	
 }
