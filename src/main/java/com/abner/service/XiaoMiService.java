@@ -39,31 +39,30 @@ public class XiaoMiService {
 	
 	
 	public boolean islogin(){
-		try{
-			String miString = FileUtil.readFileToString(FilePathManage.userConfig);
-			if(miString==null||miString.length()==0){
-				return false;
-			}
-			User oldUser = JsonUtil.toBean(miString, User.class);
-			if(oldUser==null){
-				return false;
-			}
-			if(!oldUser.equals(Config.user)){
-				return false;
-			}
-			if(oldUser.getCookies()==null||oldUser.getCookies().size()==0){
-				return false;
-			}
-			String result = httpService.getNoRetry(FilePathManage.checkLoginStatusJs, "");
-			if(result.equals("true")){
-				return true;
-			}
+		String miString = FileUtil.readFileToString(FilePathManage.userConfig);
+		if(miString==null||miString.length()==0){
 			return false;
+		}
+		User oldUser = JsonUtil.toBean(miString, User.class);
+		if(oldUser==null){
+			return false;
+		}
+		if(!oldUser.equals(Config.user)){
+			return false;
+		}
+		if(oldUser.getCookies()==null||oldUser.getCookies().size()==0){
+			return false;
+		}
+		String result = "";
+		try{
+			result = httpService.get(FilePathManage.checkLoginStatusJs, "");
 		}catch(Exception e){
 			logger.info("验证登录异常");
 		}
+		if(result.equals("true")){
+			return true;
+		}
 		return false;
-		
 
 	}
 	
@@ -99,7 +98,12 @@ public class XiaoMiService {
 	public void getBuyUrl(){
 		List<String> buyUrl = null;
 		while(buyUrl==null||buyUrl.size()==0){
-			String result = httpService.getNoRetry(FilePathManage.buyGoodsJs, "");
+			String result ="";
+			try{
+				result = httpService.getNoRetry(FilePathManage.buyGoodsJs, "");
+			}catch(Exception e){
+				logger.info("未发现购买按钮");
+			}
 			buyUrl = JsonUtil.toList(result, String.class);
 			if(buyUrl==null||buyUrl.isEmpty()){
 				logger.info("未发现购买按钮");
