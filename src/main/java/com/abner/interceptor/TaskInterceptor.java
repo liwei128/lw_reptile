@@ -110,13 +110,16 @@ public class TaskInterceptor implements MethodInterceptor{
 	 * Object
 	 */
 	private Object asyncTask(Object obj, Method method, Object[] args, MethodProxy proxy) {
-		MyThreadPool.execute(() -> {
-            try {
-                proxy.invokeSuper(obj, args);
-            } catch (Throwable e) {
-                logger.error("异步方法 :{} 发生错误:{}",method.getName(),e.getMessage());
-            }
-        });
+		Async async = method.getAnnotation(Async.class);
+		for(int i =0;i<async.value();i++){
+			MyThreadPool.execute(() -> {
+	            try {
+	                proxy.invokeSuper(obj, args);
+	            } catch (Throwable e) {
+	                logger.error("异步方法 :{} 发生错误:{}",method.getName(),e.getMessage());
+	            }
+	        });
+		}
 		return null;
 	}
 
@@ -152,7 +155,7 @@ public class TaskInterceptor implements MethodInterceptor{
 		logger.info("定时任务:{} 开始.",method.getName());
 		Timing timing = method.getAnnotation(Timing.class);
 		Runnable runnable = () -> {
-            try {
+			try {
                 proxy.invokeSuper(obj, args);
             } catch (Throwable e) {
                 logger.error("定时任务:{} 发生错误:{}",method.getName(),e.getMessage());

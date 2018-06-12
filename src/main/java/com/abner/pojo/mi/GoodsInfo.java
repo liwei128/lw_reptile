@@ -1,8 +1,10 @@
 package com.abner.pojo.mi;
 
+import java.util.Arrays;
 import java.util.List;
 
 import com.abner.utils.JsonUtil;
+import com.google.common.collect.Lists;
 
 /**
  * 要购买的商品
@@ -38,6 +40,26 @@ public class GoodsInfo {
 	public String toString() {
 		return JsonUtil.toString(this);
 	}
+
+	public GoodsInfo(String url, Integer ... params_index) throws Exception {
+		super();
+		if(url==null||url.length()==0){
+			throw new Exception("链接地址不能为空");
+		}
+		if(params_index==null||params_index.length==0){
+			throw new Exception("选项不合法");
+		}
+		this.url = url;
+		this.params_index = Lists.newArrayList(Arrays.asList(params_index));
+	}
+
+	public GoodsInfo() {
+		super();
+	}
+	
+	
+	
+	
 	
 	
 	

@@ -18,4 +18,8 @@ public class StatusManage {
 	//联网标志
 	public static volatile int ping = 999;
 	
+	//抢购结束标志
+	public static volatile boolean isEnd = false;
+	
+	
 }
