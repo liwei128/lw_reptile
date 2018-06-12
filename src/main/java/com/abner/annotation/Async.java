@@ -14,6 +14,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Async {
 	
-	String value() default "";
+	int value() default 1;
 
 }

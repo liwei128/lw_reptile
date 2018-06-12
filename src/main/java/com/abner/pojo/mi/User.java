@@ -54,7 +54,21 @@ public class User {
 		}
 		return false;
 	}
-	
+
+	public User() {
+		super();
+	}
+
+	public User(String userName, String password) throws Exception {
+		if(userName==null||userName.length()==0){
+			throw new Exception("账号不能为空");
+		}
+		if(password==null||password.length()==0){
+			throw new Exception("密码不能为空");
+		}
+		this.userName = userName;
+		this.password = password;
+	}
 	
 	
 }

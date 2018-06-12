@@ -17,7 +17,6 @@ import com.abner.db.UrlStorage;
 import com.abner.filter.ImgFilter;
 import com.abner.filter.LinkFilter;
 import com.abner.manage.Config;
-import com.abner.manage.FilePathManage;
 import com.abner.manage.StatusManage;
 import com.abner.enums.MonitorName;
 import com.abner.pojo.MyUrl;
@@ -78,7 +77,7 @@ public class LoadUrlsService{
 	@Async
 	public boolean load(MyUrl reqUrl) {
 		try{
-			String html = httpService.get(FilePathManage.js,reqUrl.getUrl());
+			String html = httpService.get(reqUrl.getUrl());
 			MonitorDataStorage.record(MonitorName.DONEURL.name());
 			logger.info("网页加载成功,时间:{}ms, 网址:{}",reqUrl.loadTime(),reqUrl.getUrl());
 			parseHtmlService.parseReqUrl(html,new LinkFilter(reqUrl.getUrl()));

@@ -2,8 +2,7 @@ package com.abner;
 
 import java.text.ParseException;
 
-import com.abner.controller.XiaoMiController;
-import com.abner.manage.ServiceFactory;
+import com.abner.view.XiaoMiView;
 
 
 /**
@@ -15,10 +14,7 @@ import com.abner.manage.ServiceFactory;
 public class XiaoMiClient {
 	
 	public static void main(String[] args) throws ParseException {
-		XiaoMiController miController = ServiceFactory.getService(XiaoMiController.class);
-		miController.start();
+		new XiaoMiView();
 	}
-
-	
 
 }

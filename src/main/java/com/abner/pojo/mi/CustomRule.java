@@ -1,6 +1,5 @@
 package com.abner.pojo.mi;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import com.abner.utils.JsonUtil;
 
@@ -12,65 +11,79 @@ import com.abner.utils.JsonUtil;
  */
 public class CustomRule {
 	
-	//并发抢购数量
-	private int count;
+	//登录时间
+	private long loginTime;//提前2分钟
 	
 	//抢购时间
-	private long buyTime;
+	private long buyTime;//提前30s
 	
-	//登录时间
-	private long loginTime;
-
+	//抢购截止时间
+	private long endTime;
 
 	@Override
 	public String toString() {
 		return JsonUtil.toString(this);
 	}
 	
-	
-
-	public int getCount() {
-		return count;
-	}
-
-
-
-	public void setCount(int count) {
-		this.count = count;
-	}
-
-
-
 	public long getBuyTime() {
 		return buyTime;
 	}
 
-
-
 	public void setBuyTime(long buyTime) {
 		this.buyTime = buyTime;
 	}
-
-
-
+	
 	public long getLoginTime() {
 		return loginTime;
 	}
 
-
-
 	public void setLoginTime(long loginTime) {
 		this.loginTime = loginTime;
 	}
-
-
-
-	public void builderTime(String timeFormat) throws ParseException {
-		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		long time = simpleDateFormat.parse(timeFormat).getTime()-System.currentTimeMillis();
-		this.loginTime = time-2*60*1000;
-		this.buyTime = time;
+	
+	public long getEndTime() {
+		return endTime;
 	}
+
+	public void setEndTime(long endTime) {
+		this.endTime = endTime;
+	}
+
+	public void builderTime(String startTime,String duration) throws Exception{
+		try{
+			int minute = Integer.parseInt(duration);
+			if(minute>5){
+				throw new Exception("抢购时长不得超过5分钟");
+			}
+			if(minute<=0){
+				throw new Exception("抢购时长必须大于0");
+			}
+			
+			SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			long time = simpleDateFormat.parse(startTime).getTime()-System.currentTimeMillis();
+			this.buyTime = time-30*1000;
+			this.loginTime = time-2*60*1000;
+			this.endTime = time+minute*60*1000;
+		}catch(Exception e){
+			throw new Exception("时间格式不正确");
+		}
+	}
+	
+	public CustomRule(String buyTime, String duration) throws Exception {
+		if(buyTime==null||buyTime.length()==0){
+			throw new Exception("抢购时间不能为空");
+		}
+		if(duration ==null||duration.length()==0){
+			throw new Exception("抢购时长不能为空");
+		}
+		builderTime(buyTime, duration);
+	}
+
+	public CustomRule() {
+		super();
+	}
+	
+	
 	
 	
 
