@@ -148,9 +148,7 @@ public class HttpService {
     	CloseableHttpResponse response=null;
 		try{
     		HttpGet httpGet = new HttpGet(url);
-    		
     		httpGet.addHeader(new BasicHeader("Cookie",builderCookiesStr(cookies)));
-    		httpGet.setHeader("Host", "cart.mi.com");
     		httpGet.setHeader("Connection", "keep-alive");
        		httpGet.setHeader("User-Agent", "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Mobile Safari/537.36");
             response = httpClient.execute(httpGet);
@@ -180,8 +178,6 @@ public class HttpService {
 			BasicClientCookie bcookie = new BasicClientCookie(cookie.getName(), cookie.getValue()); 
 			bcookie.setDomain(cookie.getDomain());
 			bcookie.setPath(cookie.getPath());
-			bcookie.setVersion(0);
-			bcookie.setExpiryDate(new Date(System.currentTimeMillis()+60*60*1000));
 			cookieStore.addCookie(bcookie);
 		}
         // 设置默认跳转以及存储cookie  
