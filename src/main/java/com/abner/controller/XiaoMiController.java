@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import com.abner.annotation.Controller;
 import com.abner.annotation.Resource;
+import com.abner.annotation.Singleton;
 import com.abner.db.LogStorage;
 import com.abner.manage.mi.Config;
 import com.abner.service.LoadUrlsService;
@@ -36,13 +37,12 @@ public class XiaoMiController {
 	
 	
 	public void start() throws ParseException{
-		loadUrlsService.cleanPhantomjs();
 		xiaomiService.start();
 		logger.info("param:{},{},{}",Config.user,Config.goodsInfo,Config.customRule);
 		
 	}
 	
-
+	@Singleton
 	public void init() {
 		logService.readLogs();
 		loadUrlsService.cleanPhantomjs();

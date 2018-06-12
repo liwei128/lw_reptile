@@ -102,7 +102,7 @@ public class XiaoMiService {
 				logger.info("未发现购买链接({})",count);
 			}
 			String result = httpService.execute(FilePathManage.buyGoodsJs);
-			if(result.startsWith("[")&&result.endsWith("]")){
+			if(result.startsWith("[")&&result.endsWith("]")&&result.length()>10){
 				List<String> buyUrl = JsonUtil.toList(result, String.class);
 				logger.info("购买链接:{}",buyUrl);
 				return buyUrl;

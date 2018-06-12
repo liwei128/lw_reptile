@@ -1,5 +1,7 @@
 package com.abner.view;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -145,6 +147,7 @@ public abstract class AbstractXiaoMiFunction {
 			String user = getUserText().getText().trim();
 			String password = getPasswordText().getText().trim();
 			Config.user = new User(user,password);
+			Config.submitCount = new AtomicInteger(0);
 		}
 		
 		//初始化视图
