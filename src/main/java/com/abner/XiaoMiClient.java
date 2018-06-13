@@ -1,6 +1,5 @@
 package com.abner;
 
-import java.text.ParseException;
 
 import com.abner.view.XiaoMiView;
 
@@ -13,7 +12,7 @@ import com.abner.view.XiaoMiView;
  */
 public class XiaoMiClient {
 	
-	public static void main(String[] args) throws ParseException {
+	public static void main(String[] args) {
 		new XiaoMiView();
 	}
 
