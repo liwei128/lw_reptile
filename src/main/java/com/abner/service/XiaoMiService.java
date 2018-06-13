@@ -136,8 +136,7 @@ public class XiaoMiService {
 			long start = System.currentTimeMillis();
 			String re = httpService.getByCookies(url, cookies);
 			if(re!=null){
-				Config.submitCount.addAndGet(1);
-				logger.info("提交成功({}),看人品咯！{}ms,{}",Config.submitCount.toString(),System.currentTimeMillis()-start,url);
+				logger.info("提交成功({}),看人品咯！{}ms,{}",Config.submitCount.addAndGet(1),System.currentTimeMillis()-start,url);
 			}
 		}
 	}
