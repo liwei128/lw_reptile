@@ -39,6 +39,9 @@ public class XiaoMiService {
 	
 	
 	public boolean islogin(){
+		if(!FileUtil.isFile(FilePathManage.userConfig)){
+			return false;
+		}
 		String miString = FileUtil.readFileToString(FilePathManage.userConfig);
 		if(miString==null||miString.length()==0){
 			return false;

@@ -41,6 +41,17 @@ public class FileUtil {
         }
 		
 	}
+	/**
+	 * 文件是否存在
+	 */
+	public static boolean isFile(String filePath) {
+		if(filePath==null){
+			return false;
+		}
+		File file = new File(filePath);
+        return file.exists()&&file.isFile();
+		
+	}
 	
 	 /**
      * 读取文件
