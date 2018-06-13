@@ -12,7 +12,7 @@ import com.abner.utils.JsonUtil;
 public class CustomRule {
 	
 	//抢购时间
-	private long buyTime;//提前30s
+	private long buyTime;//提前10s
 	
 	//抢购截止时间
 	private long endTime;
@@ -54,9 +54,12 @@ public class CustomRule {
 		}catch(Exception e){
 			throw new Exception("时间格式不正确");
 		}
-		this.buyTime = time-15*1000;
+		this.buyTime = time-10*1000;
 		if(buyTime<0){
 			throw new Exception("貌似错过了抢购时间");
+		}
+		if(time<60*1000){
+			throw new Exception("时间太紧，来不及登录啊");
 		}
 		this.endTime = time+minute*60*1000;
 	}

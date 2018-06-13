@@ -15,5 +15,7 @@ import java.lang.annotation.Target;
 public @interface Async {
 	
 	int value() default 1;
+	
+	long interval() default 0;
 
 }

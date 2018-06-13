@@ -146,6 +146,11 @@ public class TaskInterceptor implements MethodInterceptor{
 	                logger.error("异步方法 :{} 发生错误:{}",method.getName(),e.getMessage());
 	            }
 	        });
+			try {
+				Thread.sleep(async.interval());
+			} catch (InterruptedException e) {
+				
+			}
 		}
 		return null;
 	}

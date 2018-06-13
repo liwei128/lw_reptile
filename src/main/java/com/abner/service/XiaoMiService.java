@@ -83,7 +83,7 @@ public class XiaoMiService {
 		FileUtil.writeToFile(JsonUtil.toString(Config.user), FilePathManage.userConfig);
 		String result = httpService.execute(FilePathManage.loginJs);
 		if(result.length()==0||result.equals("false")){
-			logger.error("用户:{} 登录失败,时间:{}ms,正准备重试。。。",Config.user.getUserName(),System.currentTimeMillis()-start);
+			logger.error("用户:{} 登录失败,时间:{}ms,正准备重试。。。建议清空缓存或检查账号密码是否正确。",Config.user.getUserName(),System.currentTimeMillis()-start);
 			return "fail";
 		}else{
 			List<Cookie> cookies = JsonUtil.toList(result, Cookie.class);
@@ -96,27 +96,32 @@ public class XiaoMiService {
 	}
 	
 	/**
-	 * 获取购买链接
+	 * 每秒开一个线程，共开5个线程,去获取购买url
 	 */
-	@Timing(initialDelay = 0, period = 200, type = TimingType.FIXED_DELAY, unit = TimeUnit.MILLISECONDS)
+	@Async(value = 5, interval = 1000)
 	public void getBuyUrl(){
+		buyUrl();
+	}
+	
+	@Retry2(success = "ok",interval = 500)
+	public String  buyUrl() {
+		if(StatusManage.isBuyUrl){
+			return "ok";
+		}
 		if(StatusManage.isLogin){
 			String result = httpService.execute(FilePathManage.buyGoodsJs);
 			if(result.startsWith("[")&&result.endsWith("]")&&result.length()>10){
 				List<String> buyUrl = JsonUtil.toList(result, String.class);
 				Config.goodsInfo.setBuyUrls(buyUrl);
 				StatusManage.isBuyUrl = true;
-				logger.info("购买链接:{}",buyUrl);
-				stopGetBuyUrl();
+				logger.info("购买链接:{},开始抢购！",Config.goodsInfo.getBuyUrls());
+				return "ok";
 			}
-			logger.info("未发现购买链接。");
 		}
-	}
-	
-	@Stop(methods = { "getBuyUrl" })
-	public void stopGetBuyUrl() {
+		return "fail";
 		
 	}
+
 
 	/**
 	 * httpClient执行购买
@@ -144,9 +149,10 @@ public class XiaoMiService {
 	public void start(){
 		//购买
 		MyThreadPool.schedule(()->{
-			logger.info("离开放购买还有15s,准备抢购中。。。");
-			FileUtil.writeToFile(JsonUtil.toString(Config.goodsInfo), FilePathManage.goodsInfoConfig);
+			logger.info("离开放购买还有10s,准备抢购");
+			logger.info("获取购买链接中。。。");
 			getBuyUrl();
+			
 			buyGoodsTask();
 			
 		}, Config.customRule.getBuyTime(), TimeUnit.MILLISECONDS);
@@ -156,8 +162,11 @@ public class XiaoMiService {
 		}, Config.customRule.getEndTime(), TimeUnit.MILLISECONDS);
 
 	}
-	@Stop(methods = { "buyGoodsTask" ,"keeplogin","getBuyUrl"})
+	@Stop(methods = { "buyGoodsTask" ,"keeplogin"})
 	public void stop() {
+		
+		StatusManage.isBuyUrl = true;//停止buyUrl
+		
 		logger.info("抢购时间截止,停止抢购!");
 		StatusManage.isEnd = true;
 	}
