@@ -58,6 +58,9 @@
 
 10.占用内存及CPU较低，可长时间自动化爬取。
 
+#抢购小米
+最新版本已经支持抢购小米，打包好的可运行程序见https://github.com/liwei128/reptile.run.git
+
 
 
 #联系作者Email：1038084585@qq.com

@@ -3,9 +3,8 @@
 .project
 .classpath
 logs
-bin
 config
-
+bin
 
 *.orig
 
