@@ -56,7 +56,7 @@ public class XiaoMiView extends AbstractXiaoMiFunction{
 		shell.setText("fuckXiaoMi");
 		shell.setSize(650, 375);
 		
-        
+		
 		/**
 		 * 购买链接
 		 */
@@ -78,6 +78,7 @@ public class XiaoMiView extends AbstractXiaoMiFunction{
          * 选项1
          */
 		option1 = new Combo(shell, SWT.DROP_DOWN | SWT.READ_ONLY);
+		option1.add("默认");
 		option1.add("1");
 		option1.add("2");
 		option1.add("3");
@@ -94,6 +95,7 @@ public class XiaoMiView extends AbstractXiaoMiFunction{
          * 选项2
          */
 		option2 = new Combo(shell, SWT.DROP_DOWN | SWT.READ_ONLY);
+		option2.add("默认");
 		option2.add("1");
 		option2.add("2");
 		option2.add("3");
@@ -108,11 +110,11 @@ public class XiaoMiView extends AbstractXiaoMiFunction{
          * 选项3
          */
 		option3 = new Combo(shell, SWT.DROP_DOWN | SWT.READ_ONLY);
+		option3.add("默认");
 		option3.add("1");
 		option3.add("2");
 		option3.add("3");
-		option3.add("");
-		option3.select(3);
+		option3.select(0);
 		option3.setLocation(470,66);
 		option3.setSize(150, 20);
 		
@@ -127,6 +129,7 @@ public class XiaoMiView extends AbstractXiaoMiFunction{
 		buyTimeText = new Text(shell, SWT.BORDER);
 		buyTimeText.setLocation(120, 112);
 		buyTimeText.setSize(500, 20);
+
 		
 		/**
 		 * 抢购时长(分钟)
@@ -160,7 +163,7 @@ public class XiaoMiView extends AbstractXiaoMiFunction{
         password.setLocation(20, 250);
         password.setSize(100, 20);
         
-        passwordText = new Text(shell, SWT.BORDER);
+        passwordText = new Text(shell, SWT.BORDER|SWT.PASSWORD);
         passwordText.setLocation(120, 250);
         passwordText.setSize(500, 20);
         

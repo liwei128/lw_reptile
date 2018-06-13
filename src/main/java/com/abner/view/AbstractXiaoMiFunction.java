@@ -1,5 +1,7 @@
 package com.abner.view;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.eclipse.swt.SWT;
@@ -135,11 +137,7 @@ public abstract class AbstractXiaoMiFunction {
 			int index1 = getOption1().getSelectionIndex();
 			int index2 = getOption2().getSelectionIndex();
 			int index3 = getOption3().getSelectionIndex();
-			if(index3==3){
-				Config.goodsInfo = new GoodsInfo(url,index1,index2);
-			}else{
-				Config.goodsInfo = new GoodsInfo(url,index1,index2,index3);
-			}
+			Config.goodsInfo = new GoodsInfo(url,index1,index2,index3);
 			String buyTime = getBuyTimeText().getText().trim();
 			String duration = getDurationText().getText().trim();
 			Config.customRule = new CustomRule(buyTime,duration);
@@ -153,8 +151,16 @@ public abstract class AbstractXiaoMiFunction {
 		//初始化视图
 		private void initView() {
 			xiaoMiController.init();
+			//设置界面参数
+			setViewSetting();
 		}
 		
+		private void setViewSetting() {
+			SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			long time = System.currentTimeMillis()+2*60*1000;
+			getBuyTimeText().setText(format.format(new Date(time)));
+			
+		}
 		//日志输出
 		private void loadLog() {
 			String loadLog = xiaoMiController.loadLog();
@@ -175,11 +181,16 @@ public abstract class AbstractXiaoMiFunction {
 				//修改状态为完成
 				modifyStatus(true);
 				//发送消息
-				String msg = "抢购结束";
+				int count = Config.submitCount.get();
+				if(count>100){
+					sendMsg("已抢购"+count+"次,秒杀99.99%的米猴!");
+				}else{
+					sendMsg("抢购时间结束");
+				}
 				//恢复初始状态
 				StatusManage.isEnd = false;
 				
-				sendMsg(msg);
+				
 			}
 			
 		}

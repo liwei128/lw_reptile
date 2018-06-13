@@ -9,8 +9,8 @@ import org.slf4j.LoggerFactory;
 
 import com.abner.annotation.Async;
 import com.abner.annotation.Resource;
+import com.abner.annotation.Retry2;
 import com.abner.annotation.Service;
-import com.abner.annotation.Singleton;
 import com.abner.annotation.Stop;
 import com.abner.annotation.Timing;
 import com.abner.enums.TimingType;
@@ -55,6 +55,7 @@ public class XiaoMiService {
 		}
 		String result = httpService.execute(FilePathManage.checkLoginStatusJs);
 		if(result.equals("true")){
+			Config.user.setCookies(oldUser.getCookies());
 			return true;
 		}
 		return false;
@@ -64,66 +65,73 @@ public class XiaoMiService {
 	/**
 	 * 保持登录状态
 	 */
-	@Singleton
 	@Timing(initialDelay = 0, period = 10, type = TimingType.FIXED_RATE, unit = TimeUnit.MINUTES)
 	public void keeplogin() {
-		login();
+		if(!islogin()){
+			StatusManage.isLogin = false;
+			login();
+			StatusManage.isLogin = true;
+		}else{
+			logger.info("用户:{} 已登录。",Config.user.getUserName());
+			StatusManage.isLogin = true;
+		}
 	}
 	
-	public void login() {
-		if(islogin()){
-			logger.info("用户:{} 已登录。",Config.user.getUserName());
-			return ;
-		}
+	@Retry2(success = "ok")
+	public String login() {
 		long start = System.currentTimeMillis();
 		FileUtil.writeToFile(JsonUtil.toString(Config.user), FilePathManage.userConfig);
-		String result = "";
-		int loginCount = 0;
-		while(result.length()==0||result.equals("false")){
-			if(loginCount!=0){
-				logger.error("用户登录失败({}),正准备重试。。。",loginCount);
-			}
-			result = httpService.execute(FilePathManage.loginJs);
-			loginCount++;
+		String result = httpService.execute(FilePathManage.loginJs);
+		if(result.length()==0||result.equals("false")){
+			logger.error("用户:{} 登录失败,时间:{}ms,正准备重试。。。",Config.user.getUserName(),System.currentTimeMillis()-start);
+			return "fail";
+		}else{
+			List<Cookie> cookies = JsonUtil.toList(result, Cookie.class);
+			Config.user.setCookies(cookies);
+			FileUtil.writeToFile(JsonUtil.toString(Config.user), FilePathManage.userConfig);
+			logger.info("用户:{} 登录成功,时间:{}ms",Config.user.getUserName(),System.currentTimeMillis()-start);
+			return "ok";
 		}
-		List<Cookie> cookies = JsonUtil.toList(result, Cookie.class);
-		Config.user.setCookies(cookies);
-		FileUtil.writeToFile(JsonUtil.toString(Config.user), FilePathManage.userConfig);
-		logger.info("用户:{} 登录成功,时间:{}ms",Config.user.getUserName(),System.currentTimeMillis()-start);
+		
 	}
 	
 	/**
 	 * 获取购买链接
 	 */
-	public List<String> getBuyUrl(){
-		int count = 0;
-		while(true){
-			if(count!=0){
-				logger.info("未发现购买链接({})",count);
-			}
+	@Timing(initialDelay = 0, period = 200, type = TimingType.FIXED_DELAY, unit = TimeUnit.MILLISECONDS)
+	public void getBuyUrl(){
+		if(StatusManage.isLogin){
 			String result = httpService.execute(FilePathManage.buyGoodsJs);
 			if(result.startsWith("[")&&result.endsWith("]")&&result.length()>10){
 				List<String> buyUrl = JsonUtil.toList(result, String.class);
+				Config.goodsInfo.setBuyUrls(buyUrl);
+				StatusManage.isBuyUrl = true;
 				logger.info("购买链接:{}",buyUrl);
-				return buyUrl;
-				
+				stopGetBuyUrl();
 			}
-			count++;
+			logger.info("未发现购买链接。");
 		}
 	}
 	
+	@Stop(methods = { "getBuyUrl" })
+	public void stopGetBuyUrl() {
+		
+	}
+
 	/**
 	 * httpClient执行购买
 	 * @param buyUrl
 	 * @param cookies
 	 */
-	@Timing(initialDelay = 0, period = 300, type = TimingType.FIXED_RATE, unit = TimeUnit.MILLISECONDS)
-	public void buyGoodsTask(List<String> buyUrl,List<Cookie> cookies) {
-		buy(buyUrl,cookies);
+	@Timing(initialDelay = 0, period = 400, type = TimingType.FIXED_RATE, unit = TimeUnit.MILLISECONDS)
+	public void buyGoodsTask() {
+		if(StatusManage.isLogin&&StatusManage.isBuyUrl){
+			buy(Config.goodsInfo.getBuyUrls(),Config.user.getCookies());
+		}
 	}
 	
 	@Async(50)
-	public void buy(List<String> buyUrl,List<Cookie> cookies){
+	public void buy(List<String> buyUrl, List<Cookie> cookies){
 		for(String url:buyUrl){
 			long start = System.currentTimeMillis();
 			String re = httpService.getByCookies(url, cookies);
@@ -135,21 +143,13 @@ public class XiaoMiService {
 	}
 	
 	public void start(){
-		//登录
-		MyThreadPool.schedule(()->{
-			logger.info("离开放购买还有2分钟,准备登录中。。。");
-			keeplogin();
-		}, Config.customRule.getLoginTime(), TimeUnit.MILLISECONDS);
-		
 		//购买
 		MyThreadPool.schedule(()->{
-			logger.info("离开放购买还有30s,准备抢购中。。。");
-			login();
+			logger.info("离开放购买还有15s,准备抢购中。。。");
 			FileUtil.writeToFile(JsonUtil.toString(Config.goodsInfo), FilePathManage.goodsInfoConfig);
-			List<String> buyUrl = getBuyUrl();
-			String miString = FileUtil.readFileToString(FilePathManage.userConfig);
-			User user = JsonUtil.toBean(miString, User.class);
-			buyGoodsTask(buyUrl,user.getCookies());
+			getBuyUrl();
+			buyGoodsTask();
+			
 		}, Config.customRule.getBuyTime(), TimeUnit.MILLISECONDS);
 		//抢购时间截止
 		MyThreadPool.schedule(()->{
@@ -157,7 +157,7 @@ public class XiaoMiService {
 		}, Config.customRule.getEndTime(), TimeUnit.MILLISECONDS);
 
 	}
-	@Stop(methods = { "buyGoodsTask" })
+	@Stop(methods = { "buyGoodsTask" ,"keeplogin","getBuyUrl"})
 	public void stop() {
 		logger.info("抢购时间截止,停止抢购!");
 		StatusManage.isEnd = true;

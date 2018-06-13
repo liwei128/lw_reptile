@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import com.abner.annotation.Async;
 import com.abner.annotation.Retry;
+import com.abner.annotation.Retry2;
 import com.abner.annotation.Singleton;
 import com.abner.annotation.Stop;
 import com.abner.annotation.Timing;
@@ -44,6 +45,10 @@ public class TaskInterceptor implements MethodInterceptor{
 		if(method.getAnnotation(Retry.class)!=null){
 			return retryTask(obj,method,args,proxy);
 		}
+		//重试方法2
+		if(method.getAnnotation(Retry2.class)!=null){
+			return retryTask2(obj,method,args,proxy);
+		}
 		//定时任务
 		if(method.getAnnotation(Timing.class)!=null){
 			return timingTask(obj,method,args,proxy);
@@ -64,6 +69,28 @@ public class TaskInterceptor implements MethodInterceptor{
 		//同步方法
 		return proxy.invokeSuper(obj, args);
 		
+	}
+
+	/**
+	 * 
+	 * @param obj
+	 * @param method
+	 * @param args
+	 * @param proxy
+	 * @return
+	 */
+	private Object retryTask2(Object obj, Method method, Object[] args, MethodProxy proxy) {
+		Retry2 retry = method.getAnnotation(Retry2.class);
+		Object result = null;
+		while(!retry.success().equals(result)){
+			try {
+				Thread.sleep(retry.interval());
+				result = proxy.invokeSuper(obj, args);
+			} catch (Throwable e) {
+				logger.error("error:{},msg:{}",e.getClass().getName(),e.getMessage());
+			}
+		}
+		return result;
 	}
 
 

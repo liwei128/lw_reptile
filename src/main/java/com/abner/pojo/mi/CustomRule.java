@@ -11,9 +11,6 @@ import com.abner.utils.JsonUtil;
  */
 public class CustomRule {
 	
-	//登录时间
-	private long loginTime;//提前2分钟
-	
 	//抢购时间
 	private long buyTime;//提前30s
 	
@@ -33,14 +30,6 @@ public class CustomRule {
 		this.buyTime = buyTime;
 	}
 	
-	public long getLoginTime() {
-		return loginTime;
-	}
-
-	public void setLoginTime(long loginTime) {
-		this.loginTime = loginTime;
-	}
-	
 	public long getEndTime() {
 		return endTime;
 	}
@@ -50,23 +39,26 @@ public class CustomRule {
 	}
 
 	public void builderTime(String startTime,String duration) throws Exception{
+
+		int minute = Integer.parseInt(duration);
+		if(minute>5){
+			throw new Exception("抢购时长不得超过5分钟");
+		}
+		if(minute<=0){
+			throw new Exception("抢购时长必须大于0");
+		}
+		long time = 0L;
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		try{
-			int minute = Integer.parseInt(duration);
-			if(minute>5){
-				throw new Exception("抢购时长不得超过5分钟");
-			}
-			if(minute<=0){
-				throw new Exception("抢购时长必须大于0");
-			}
-			
-			SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-			long time = simpleDateFormat.parse(startTime).getTime()-System.currentTimeMillis();
-			this.buyTime = time-30*1000;
-			this.loginTime = time-2*60*1000;
-			this.endTime = time+minute*60*1000;
+			time = simpleDateFormat.parse(startTime).getTime()-System.currentTimeMillis();
 		}catch(Exception e){
 			throw new Exception("时间格式不正确");
 		}
+		this.buyTime = time-15*1000;
+		if(buyTime<0){
+			throw new Exception("貌似错过了抢购时间");
+		}
+		this.endTime = time+minute*60*1000;
 	}
 	
 	public CustomRule(String buyTime, String duration) throws Exception {

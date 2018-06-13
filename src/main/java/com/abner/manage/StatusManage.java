@@ -18,6 +18,12 @@ public class StatusManage {
 	//联网标志
 	public static volatile int ping = 999;
 	
+	//登录状态
+	public static volatile boolean isLogin = false;
+	
+	//是否发现购买链接
+	public static volatile boolean isBuyUrl = false;
+	
 	//抢购结束标志
 	public static volatile boolean isEnd = false;
 	

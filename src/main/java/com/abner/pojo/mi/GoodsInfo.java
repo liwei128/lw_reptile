@@ -1,8 +1,6 @@
 package com.abner.pojo.mi;
 
-import java.util.Arrays;
 import java.util.List;
-
 import com.abner.utils.JsonUtil;
 import com.google.common.collect.Lists;
 
@@ -18,7 +16,20 @@ public class GoodsInfo {
 	private String url;
 	
 	//选项：版本、颜色、保障服务等
-	private List<Integer> params_index;
+	private List<Option> params_index;
+	
+	//抢购链接
+	private List<String> buyUrls;
+	
+	
+
+	public List<String> getBuyUrls() {
+		return buyUrls;
+	}
+
+	public void setBuyUrls(List<String> buyUrls) {
+		this.buyUrls = buyUrls;
+	}
 
 	public String getUrl() {
 		return url;
@@ -28,11 +39,11 @@ public class GoodsInfo {
 		this.url = url;
 	}
 
-	public List<Integer> getParams_index() {
+	public List<Option> getParams_index() {
 		return params_index;
 	}
 
-	public void setParams_index(List<Integer> params_index) {
+	public void setParams_index(List<Option> params_index) {
 		this.params_index = params_index;
 	}
 
@@ -50,7 +61,12 @@ public class GoodsInfo {
 			throw new Exception("选项不合法");
 		}
 		this.url = url;
-		this.params_index = Lists.newArrayList(Arrays.asList(params_index));
+		this.params_index = Lists.newArrayList();
+		for(int i =0;i<params_index.length;i++){
+			if(params_index[i]!=0){
+				this.params_index.add(new Option(i, params_index[i]-1));
+			}
+		}
 	}
 
 	public GoodsInfo() {
