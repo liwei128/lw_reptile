@@ -37,6 +37,9 @@ public class XiaoMiService {
 	@Resource
 	private HttpService httpService;
 	
+	@Resource
+	private ParseHtmlService parseHtmlService;
+	
 	
 	public boolean islogin(){
 		if(!FileUtil.isFile(FilePathManage.userConfig)){
@@ -144,8 +147,13 @@ public class XiaoMiService {
 			long start = System.currentTimeMillis();
 			String re = httpService.getByCookies(url, cookies);
 			if(re!=null){
-				logger.info("提交成功({}),看人品咯！{}ms,{}",Config.submitCount.addAndGet(1),System.currentTimeMillis()-start,url);
+				if(parseHtmlService.isBuySuccess(re)){
+					stop("恭喜！抢购成功,赶紧去购物车付款吧!");
+					return;
+				}
+				logger.info("排队中({}),看人品咯！{}ms,{}",Config.submitCount.addAndGet(1),System.currentTimeMillis()-start,url);
 			}
+			
 		}
 	}
 	
@@ -161,16 +169,18 @@ public class XiaoMiService {
 		}, Config.customRule.getBuyTime(), TimeUnit.MILLISECONDS);
 		//抢购时间截止
 		MyThreadPool.schedule(()->{
-			stop();
+			stop("抢购时间截止，停止抢购");
 		}, Config.customRule.getEndTime(), TimeUnit.MILLISECONDS);
 
 	}
 	@Stop(methods = { "buyGoodsTask" ,"keeplogin"})
-	public void stop() {
+	public void stop(String msg) {
+		
+		StatusManage.endMsg = msg;
+		logger.info(msg);
 		
 		StatusManage.isBuyUrl = true;//停止buyUrl
-		
-		logger.info("抢购时间截止,停止抢购!");
+
 		StatusManage.isEnd = true;
 	}
 	

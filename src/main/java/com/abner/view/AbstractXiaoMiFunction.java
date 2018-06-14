@@ -181,12 +181,7 @@ public abstract class AbstractXiaoMiFunction {
 				//修改状态为完成
 				modifyStatus(true);
 				//发送消息
-				int count = Config.submitCount.get();
-				if(count>100){
-					sendMsg("已抢购"+count+"次,秒杀99.99%的米猴!");
-				}else{
-					sendMsg("抢购时间结束");
-				}
+				sendMsg(StatusManage.endMsg);
 				//恢复初始状态
 				StatusManage.isEnd = false;
 				

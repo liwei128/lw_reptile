@@ -27,5 +27,8 @@ public class StatusManage {
 	//抢购结束标志
 	public static volatile boolean isEnd = false;
 	
+	//结束消息
+	public static volatile String endMsg = "";
+	
 	
 }
