@@ -2,6 +2,7 @@ package com.abner.service;
 
 
 import java.util.List;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
@@ -39,6 +40,10 @@ public class XiaoMiService {
 	
 	@Resource
 	private ParseHtmlService parseHtmlService;
+	
+	private ScheduledFuture<?> buy;
+	
+	private ScheduledFuture<?> stop;
 	
 	
 	public boolean islogin(){
@@ -88,9 +93,13 @@ public class XiaoMiService {
 		long start = System.currentTimeMillis();
 		FileUtil.writeToFile(JsonUtil.toString(Config.user), FilePathManage.userConfig);
 		String result = httpService.execute(FilePathManage.loginJs);
-		if(result.length()==0||result.equals("false")){
-			logger.error("用户:{} 登录失败,时间:{}ms,正准备重试。。。建议清空缓存或检查账号密码是否正确。",Config.user.getUserName(),System.currentTimeMillis()-start);
+		if(result.length()==0||result.equals("cache")){
+			logger.error("用户:{} 登录失败,时间:{}ms,正准备重试。。。建议清空缓存。",Config.user.getUserName(),System.currentTimeMillis()-start);
 			return "fail";
+		}else if(result.equals("pwd")){
+			logger.error("用户名或密码错误！");
+			stop("用户名或密码错误！");
+			return "ok";
 		}else{
 			List<Cookie> cookies = JsonUtil.toList(result, Cookie.class);
 			Config.user.setCookies(cookies);
@@ -159,8 +168,7 @@ public class XiaoMiService {
 	
 	public void start(){
 		//购买
-		MyThreadPool.schedule(()->{
-			logger.info("离开放购买还有10s,准备抢购");
+		buy = MyThreadPool.schedule(()->{
 			logger.info("获取购买链接中。。。");
 			getBuyUrl();
 			
@@ -168,7 +176,7 @@ public class XiaoMiService {
 			
 		}, Config.customRule.getBuyTime(), TimeUnit.MILLISECONDS);
 		//抢购时间截止
-		MyThreadPool.schedule(()->{
+		stop = MyThreadPool.schedule(()->{
 			stop("抢购时间截止，停止抢购");
 		}, Config.customRule.getEndTime(), TimeUnit.MILLISECONDS);
 
@@ -178,6 +186,14 @@ public class XiaoMiService {
 		
 		StatusManage.endMsg = msg;
 		logger.info(msg);
+		
+		if(buy!=null){
+			buy.cancel(false);//停止 购买定时器
+		}
+		
+		if(stop!=null){
+			stop.cancel(false);//停止 截止时间的定时器
+		}
 		
 		StatusManage.isBuyUrl = true;//停止buyUrl
 
