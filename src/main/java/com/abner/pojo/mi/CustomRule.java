@@ -54,7 +54,7 @@ public class CustomRule {
 		}catch(Exception e){
 			throw new Exception("时间格式不正确");
 		}
-		this.buyTime = time-2*1000;
+		this.buyTime = time-1000;
 		if(buyTime<0){
 			throw new Exception("貌似错过了抢购时间");
 		}
