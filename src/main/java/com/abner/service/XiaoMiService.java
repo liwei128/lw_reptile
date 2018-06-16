@@ -111,9 +111,9 @@ public class XiaoMiService {
 	}
 	
 	/**
-	 * 每秒开一个线程，共开5个线程,去获取购买url
+	 * 每秒开一个线程，共开8个线程,去获取购买url
 	 */
-	@Async(value = 5, interval = 800)
+	@Async(value = 8, interval = 1000)
 	public void getBuyUrl(){
 		buyUrl();
 	}
