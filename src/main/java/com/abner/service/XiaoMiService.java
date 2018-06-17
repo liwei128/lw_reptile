@@ -20,6 +20,7 @@ import com.abner.manage.MyThreadPool;
 import com.abner.manage.StatusManage;
 import com.abner.manage.mi.Config;
 import com.abner.pojo.mi.Cookie;
+import com.abner.pojo.mi.GoodsInfo;
 import com.abner.pojo.mi.User;
 import com.abner.utils.FileUtil;
 import com.abner.utils.JsonUtil;
@@ -64,7 +65,7 @@ public class XiaoMiService {
 		if(oldUser.getCookies()==null||oldUser.getCookies().size()==0){
 			return false;
 		}
-		String result = httpService.execute(FilePathManage.checkLoginStatusJs);
+		String result = httpService.execute(FilePathManage.checkLoginStatusJs,"");
 		if(result.equals("true")){
 			Config.user.setCookies(oldUser.getCookies());
 			return true;
@@ -92,7 +93,7 @@ public class XiaoMiService {
 	public String login() {
 		long start = System.currentTimeMillis();
 		FileUtil.writeToFile(JsonUtil.toString(Config.user), FilePathManage.userConfig);
-		String result = httpService.execute(FilePathManage.loginJs);
+		String result = httpService.execute(FilePathManage.loginJs,"");
 		if(result.length()==0||result.equals("cache")){
 			logger.error("用户:{} 登录失败,时间:{}ms,正准备重试。。。建议清空缓存。",Config.user.getUserName(),System.currentTimeMillis()-start);
 			return "fail";
@@ -109,33 +110,6 @@ public class XiaoMiService {
 		}
 		
 	}
-	
-	/**
-	 * 每秒开一个线程，共开8个线程,去获取购买url
-	 */
-	@Async(value = 8, interval = 1000)
-	public void getBuyUrl(){
-		buyUrl();
-	}
-	
-	@Retry2(success = "ok",interval = 500)
-	public String  buyUrl() {
-		if(StatusManage.isBuyUrl){
-			return "ok";
-		}
-		if(StatusManage.isLogin){
-			String result = httpService.execute(FilePathManage.buyGoodsJs);
-			if(result.startsWith("[")&&result.endsWith("]")&&result.length()>10){
-				List<String> buyUrl = JsonUtil.toList(result, String.class);
-				Config.goodsInfo.setBuyUrls(buyUrl);
-				StatusManage.isBuyUrl = true;
-				logger.info("购买链接:{},开始抢购！",Config.goodsInfo.getBuyUrls());
-				return "ok";
-			}
-		}
-		return "fail";
-		
-	}
 
 
 	/**
@@ -145,48 +119,41 @@ public class XiaoMiService {
 	 */
 	@Timing(initialDelay = 0, period = 400, type = TimingType.FIXED_RATE, unit = TimeUnit.MILLISECONDS)
 	public void buyGoodsTask() {
-		if(StatusManage.isLogin&&StatusManage.isBuyUrl){
-			buy(Config.goodsInfo.getBuyUrls(),Config.user.getCookies());
+		if(StatusManage.isLogin){
+			buy(Config.goodsInfo.randomBuyUrl(),Config.user.getCookies());
 		}
 	}
 	
 	@Async(50)
-	public void buy(List<String> buyUrl, List<Cookie> cookies){
-		for(String url:buyUrl){
-			long start = System.currentTimeMillis();
-			String re = httpService.getByCookies(url, cookies);
-			if(re!=null){
-				if(parseHtmlService.isBuySuccess(re)){
-					stop("恭喜！抢购成功,赶紧去购物车付款吧!");
-					return;
-				}
-				logger.info("排队中({}),看人品咯！{}ms,{}",Config.submitCount.addAndGet(1),System.currentTimeMillis()-start,url);
+	public void buy(String buyUrl, List<Cookie> cookies){
+		long start = System.currentTimeMillis();
+		String re = httpService.getByCookies(buyUrl, cookies);
+		if(re!=null){
+			if(parseHtmlService.isBuySuccess(re)){
+				stop("恭喜！抢购成功,赶紧去购物车付款吧!");
+				return;
 			}
-			
+			logger.info("提交成功({}),看人品咯！{}ms,{}",Config.submitCount.addAndGet(1),System.currentTimeMillis()-start,buyUrl);
 		}
 	}
 	
 	public void start(){
 		//购买
 		buy = MyThreadPool.schedule(()->{
-			logger.info("获取购买链接中。。。");
-			getBuyUrl();
-			
+			logger.info("开始抢购。。。");
 			buyGoodsTask();
 			
-		}, Config.customRule.getBuyTime(), TimeUnit.MILLISECONDS);
+		}, Config.customRule.getBuyTime()-System.currentTimeMillis(), TimeUnit.MILLISECONDS);
 		//抢购时间截止
 		stop = MyThreadPool.schedule(()->{
 			stop("抢购时间截止，停止抢购");
-		}, Config.customRule.getEndTime(), TimeUnit.MILLISECONDS);
+		}, Config.customRule.getEndTime()-System.currentTimeMillis(), TimeUnit.MILLISECONDS);
 
 	}
 	@Stop(methods = { "buyGoodsTask" ,"keeplogin"})
 	public void stop(String msg) {
-		
-		StatusManage.endMsg = msg;
 		logger.info(msg);
-		
+		StatusManage.endMsg = msg;
 		if(buy!=null){
 			buy.cancel(false);//停止 购买定时器
 		}
@@ -194,10 +161,36 @@ public class XiaoMiService {
 		if(stop!=null){
 			stop.cancel(false);//停止 截止时间的定时器
 		}
-		
-		StatusManage.isBuyUrl = true;//停止buyUrl
 
 		StatusManage.isEnd = true;
+	}
+	@Async
+	public void parseUrl(String url) {
+		try{
+			if(!url.startsWith(GoodsInfo.BASE_INFOURL)){
+				StatusManage.endMsg = "链接地址错误";
+				return ;
+			}
+			String result = httpService.execute(FilePathManage.buyGoodsJs,url);
+			logger.info(result);
+			if(result.length()==0){
+				StatusManage.endMsg = "链接地址分析失败";
+				return ;
+			}
+			GoodsInfo goodsInfo = JsonUtil.toBean(result, GoodsInfo.class);
+			if(goodsInfo==null||goodsInfo.getGoodsIds()==null||goodsInfo.getGoodsIds().size()==0){
+				StatusManage.endMsg = "链接地址分析失败";
+				return ;
+			}
+			goodsInfo.setUrl(url);
+			Config.goodsInfo = goodsInfo;
+			StatusManage.isParse = true;
+			StatusManage.endMsg = "";
+		}catch (Exception e) {
+			StatusManage.endMsg = "链接地址分析失败";
+		}finally {
+			GoodsInfo.ParseCount.incrementAndGet();
+		}
 	}
 	
 }

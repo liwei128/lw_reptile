@@ -1,6 +1,8 @@
 package com.abner.controller;
 
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -8,14 +10,12 @@ import com.abner.annotation.Controller;
 import com.abner.annotation.Resource;
 import com.abner.annotation.Singleton;
 import com.abner.db.LogStorage;
-import com.abner.manage.FilePathManage;
 import com.abner.manage.StatusManage;
 import com.abner.manage.mi.Config;
 import com.abner.service.LoadUrlsService;
 import com.abner.service.LogService;
 import com.abner.service.XiaoMiService;
-import com.abner.utils.FileUtil;
-import com.abner.utils.JsonUtil;
+
 
 /**
  * 抢购小米
@@ -39,11 +39,9 @@ public class XiaoMiController {
 	
 	
 	public void start(){
-		logger.info("param:{},{},{}",Config.user,Config.goodsInfo,Config.customRule);
-		
+		logger.info("user:{},buyUrl:{}",Config.user,Config.goodsInfo.getBuyUrl());
 		StatusManage.isLogin = false;
-		StatusManage.isBuyUrl = false;
-		FileUtil.writeToFile(JsonUtil.toString(Config.goodsInfo), FilePathManage.goodsInfoConfig);
+		Config.submitCount = new AtomicInteger(0);
 		xiaomiService.keeplogin();
 		xiaomiService.start();
 		
@@ -58,5 +56,9 @@ public class XiaoMiController {
 
 	public String loadLog() {
 		return LogStorage.getLog();
+	}
+
+	public void parseUrl(String url) {
+		xiaomiService.parseUrl(url);
 	}
 }

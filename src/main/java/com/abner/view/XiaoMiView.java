@@ -19,11 +19,11 @@ public class XiaoMiView extends AbstractXiaoMiFunction{
 	
 	private Label url;
 	private Text urlText;
+	private Button parseButton;
 	
 	private Label optionLable;
 	private Combo option1;
 	private Combo option2;
-	private Combo option3;
 	
 	private Label buyTime;
 	private Text buyTimeText;
@@ -43,7 +43,7 @@ public class XiaoMiView extends AbstractXiaoMiFunction{
 	
 	private Text logText;
 	
-	
+	private Label msg;
 
 	
 	
@@ -56,6 +56,9 @@ public class XiaoMiView extends AbstractXiaoMiFunction{
 		shell.setText("fuckXiaoMi");
 		shell.setSize(650, 375);
 		
+		msg = new Label(shell, SWT.PUSH);
+		msg.setLocation(500, 4);
+		msg.setSize(120, 20);
 		
 		/**
 		 * 购买链接
@@ -64,13 +67,21 @@ public class XiaoMiView extends AbstractXiaoMiFunction{
 		url.setText("购买链接:");
 		url.setLocation(20, 30);
 		url.setSize(100, 20);
+		
+		parseButton = new Button(shell, SWT.PUSH);
+		parseButton.setLocation(560, 29);
+		parseButton.setSize(60, 22);
+		parseButton.setText("解析-->");
+		
 		urlText = new Text(shell, SWT.BORDER);
 		urlText.setLocation(120, 30);
 		urlText.setSize(500, 20);
 		
 		
+		
+		
 		optionLable = new Label(shell, SWT.PUSH);
-		optionLable.setText("自定义选项:");
+		optionLable.setText("自定义选项");
 		optionLable.setLocation(20, 69);
 		optionLable.setSize(100, 20);
 		
@@ -78,45 +89,15 @@ public class XiaoMiView extends AbstractXiaoMiFunction{
          * 选项1
          */
 		option1 = new Combo(shell, SWT.DROP_DOWN | SWT.READ_ONLY);
-		option1.add("默认");
-		option1.add("1");
-		option1.add("2");
-		option1.add("3");
-		option1.add("4");
-		option1.add("5");
-		option1.select(0);
 		option1.setLocation(120,66);
-		option1.setSize(150, 20);
-        
-		
-        
+		option1.setSize(230, 20);
         
         /**
          * 选项2
          */
 		option2 = new Combo(shell, SWT.DROP_DOWN | SWT.READ_ONLY);
-		option2.add("默认");
-		option2.add("1");
-		option2.add("2");
-		option2.add("3");
-		option2.add("4");
-		option2.add("5");
-		option2.select(0);
-		option2.setLocation(295,66);
-		option2.setSize(150, 20);
-        
-        
-        /**
-         * 选项3
-         */
-		option3 = new Combo(shell, SWT.DROP_DOWN | SWT.READ_ONLY);
-		option3.add("默认");
-		option3.add("1");
-		option3.add("2");
-		option3.add("3");
-		option3.select(0);
-		option3.setLocation(470,66);
-		option3.setSize(150, 20);
+		option2.setLocation(390,66);
+		option2.setSize(230, 20);
 		
 		/**
 		 * 抢购时间
@@ -201,6 +182,7 @@ public class XiaoMiView extends AbstractXiaoMiFunction{
 		/**
 		 * 按钮绑定事件
 		 */
+		parseButton.addSelectionListener(getParseFunction());
 		startButton.addSelectionListener(getStartFunction());
 		hideButton.addSelectionListener(getHideFunction());
 		quitButton.addSelectionListener(getQuitFunction());
@@ -291,8 +273,16 @@ public class XiaoMiView extends AbstractXiaoMiFunction{
 
 
 	@Override
-	public Combo getOption3() {
-		return option3;
+	public Label getMsg() {
+		return msg;
 	}
+
+
+	@Override
+	public Button getParseButton() {
+		return parseButton;
+	}
+
+
 		
 }

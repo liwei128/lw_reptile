@@ -32,5 +32,4 @@ public class FilePathManage {
 	
 	public static String userConfig = configPath + File.separator + "user.json";
 	
-	public static String goodsInfoConfig = configPath + File.separator + "goodsInfo.json";
 }

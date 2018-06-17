@@ -1,35 +1,75 @@
 package com.abner.pojo.mi;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import com.abner.utils.JsonUtil;
-import com.google.common.collect.Lists;
 
 /**
- * 要购买的商品
+ * 商品信息
  * @author liwei
  * @date: 2018年6月8日 下午4:34:00
  *
  */
 public class GoodsInfo {
 	
-	//购买或抢购页面地址
+	public static final String BASE_INFOURL = "https://item.mi.com/product/";
+	
+	public static final String BASE_BUYURL = "https://cart.mi.com/cart/add/";
+	
+	public static final AtomicInteger ParseCount = new AtomicInteger(0);
+	
+	//商品名
+	private String name;
+	
+	//商品购买页面url
 	private String url;
 	
-	//选项：版本、颜色、保障服务等
-	private List<Option> params_index;
+	//商品购买请求Url
+	private String buyUrl;
 	
-	//抢购链接
-	private List<String> buyUrls;
+	//选项1：版本
+	private List<String> version;
 	
+	//选项2：颜色
+	private List<String> colors;
+	
+	//商品购买id
+	private List<String> goodsIds;
 	
 
-	public List<String> getBuyUrls() {
-		return buyUrls;
+	public List<String> getVersion() {
+		return version;
 	}
 
-	public void setBuyUrls(List<String> buyUrls) {
-		this.buyUrls = buyUrls;
+	public void setVersion(List<String> version) {
+		this.version = version;
 	}
+
+	public List<String> getColors() {
+		return colors;
+	}
+
+	public void setColors(List<String> colors) {
+		this.colors = colors;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public List<String> getGoodsIds() {
+		return goodsIds;
+	}
+
+	public void setGoodsIds(List<String> goodsIds) {
+		this.goodsIds = goodsIds;
+	}
+	
 
 	public String getUrl() {
 		return url;
@@ -38,46 +78,39 @@ public class GoodsInfo {
 	public void setUrl(String url) {
 		this.url = url;
 	}
-
-	public List<Option> getParams_index() {
-		return params_index;
+	
+	public String getBuyUrl() {
+		return buyUrl;
 	}
 
-	public void setParams_index(List<Option> params_index) {
-		this.params_index = params_index;
+	public void setBuyUrl(String buyUrl) {
+		this.buyUrl = buyUrl;
 	}
-
+	
 	@Override
 	public String toString() {
 		return JsonUtil.toString(this);
 	}
-
-	public GoodsInfo(String url, Integer ... params_index) throws Exception {
-		super();
-		if(url==null||url.length()==0){
-			throw new Exception("链接地址不能为空");
+	
+	public void selectBuyUrl(int v,int c) throws Exception{
+		int index = colors.size()*v+c;
+		if("empty".equals(goodsIds.get(index))){
+			throw new Exception("该商品颜色组合不存在,请重新选择");
 		}
-		if(params_index==null||params_index.length==0){
-			throw new Exception("选项不合法");
-		}
-		this.url = url;
-		this.params_index = Lists.newArrayList();
-		for(int i =0;i<params_index.length;i++){
-			if(params_index[i]!=0){
-				this.params_index.add(new Option(i, params_index[i]-1));
-			}
-		}
-	}
-
-	public GoodsInfo() {
-		super();
+		
+		this.buyUrl =  BASE_BUYURL+goodsIds.get(index);
 	}
 	
-	
-	
-	
-	
-	
-	
+	public String randomBuyUrl() {
+		long timeMillis = System.currentTimeMillis();
+		return this.buyUrl+"?jsonpcallback=jQuery111309129049260578808_"+timeMillis+"&_="+timeMillis;
+	}
+
+	public void selectBuyUrl(int index) throws Exception{
+		if("empty".equals(goodsIds.get(index))){
+			throw new Exception("该商品颜色组合不存在,请重新选择");
+		}
+		this.buyUrl =  BASE_BUYURL+goodsIds.get(index);
+	}
 
 }

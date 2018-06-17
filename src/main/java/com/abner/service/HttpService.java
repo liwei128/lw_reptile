@@ -137,10 +137,10 @@ public class HttpService {
 	 * @param jsPath
 	 * @return
 	 */
-	public String execute(String jsPath){
+	public String execute(String jsPath,String url){
 		Process p=null;
 		try {
-			p= Runtime.getRuntime().exec(FilePathManage.exe+" " +jsPath);
+			p= Runtime.getRuntime().exec(FilePathManage.exe+" " +jsPath+" "+url);
 			PhantomjsStorage.add(p);
 			InputStream is = p.getInputStream(); 
 			BufferedReader br = new BufferedReader(new InputStreamReader(is,"UTF-8")); 

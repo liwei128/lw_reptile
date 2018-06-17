@@ -12,7 +12,7 @@ import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Display;
-
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
@@ -34,6 +34,7 @@ public abstract class AbstractXiaoMiFunction {
 		//小米主服务
 		private static  XiaoMiController xiaoMiController = ServiceFactory.getService(XiaoMiController.class);
 		
+		public static final AtomicInteger ParseCount = new AtomicInteger(0);
 		/**
 		 * 窗体控件
 		 */
@@ -43,7 +44,7 @@ public abstract class AbstractXiaoMiFunction {
 		public abstract Text getLogText();
 		public abstract Button getStartButton();
 		public abstract Button getQuitButton();
-		
+		public abstract Button getParseButton();
 		public abstract Text getUrlText();
 		public abstract Text getBuyTimeText();
 		public abstract Text getDurationText();
@@ -52,7 +53,7 @@ public abstract class AbstractXiaoMiFunction {
 		
 		public abstract Combo getOption1();
 		public abstract Combo getOption2();
-		public abstract Combo getOption3();
+		public abstract Label getMsg();
 		
 		
 		//日志显示按钮
@@ -73,7 +74,44 @@ public abstract class AbstractXiaoMiFunction {
 				}
 			};
 		}
+		//url发生变化
 		
+		public SelectionAdapter getParseFunction() {
+			return new SelectionAdapter() {
+				@Override
+				public void widgetSelected(SelectionEvent event) {
+					
+					String url = getUrlText().getText().trim();
+					if(url.length()==0){
+						return;
+					}
+					if(Config.goodsInfo!=null&&url.equals(Config.goodsInfo.getUrl())){
+						return ;
+					}
+					modifyStatus(false);
+					Label msgText = getMsg();
+					msgText.setText("链接智能分析中。。。");
+					msgText.setVisible(true);
+					xiaoMiController.parseUrl(url);
+				}
+			};
+		}
+		public void initOption() {
+			Combo option1 = getOption1();
+			option1.removeAll();
+			Config.goodsInfo.getVersion().forEach(s->{
+				option1.add(s);
+				option1.select(0);
+			});
+			Combo option2 = getOption2();
+			option2.removeAll();
+			Config.goodsInfo.getColors().forEach(s->{
+				option2.add(s);
+				option2.select(0);
+			});
+			getShell().setText(Config.goodsInfo.getName());
+			
+		}
 		//退出按钮
 		public SelectionAdapter getQuitFunction(){
 			return new SelectionAdapter() {
@@ -121,23 +159,28 @@ public abstract class AbstractXiaoMiFunction {
 		
 		//修改状态后控件的变化效果
 		private void modifyStatus(boolean isFinish) {
+			getParseButton().setVisible(isFinish);
 			getStartButton().setVisible(isFinish);
 			getUrlText().setEditable(isFinish);
 			getBuyTimeText().setEditable(isFinish);
 			getDurationText().setEditable(isFinish);
 			getUserText().setEditable(isFinish);
 			getPasswordText().setEditable(isFinish);
-			
 			getOption1().setEnabled(isFinish);
 			getOption2().setEnabled(isFinish);
-			getOption3().setEnabled(isFinish);
 		}
 		public void readParameter() throws Exception {
-			String url = getUrlText().getText().trim();
-			int index1 = getOption1().getSelectionIndex();
-			int index2 = getOption2().getSelectionIndex();
-			int index3 = getOption3().getSelectionIndex();
-			Config.goodsInfo = new GoodsInfo(url,index1,index2,index3);
+			if(GoodsInfo.ParseCount.intValue()==0){
+				throw new Exception("请先解析url");
+			}
+			
+			int c = getOption2().getSelectionIndex();
+			if(Config.goodsInfo.getVersion().size()!=0){
+				int v = getOption1().getSelectionIndex();
+				Config.goodsInfo.selectBuyUrl(v, c);
+			}else{
+				Config.goodsInfo.selectBuyUrl(c);
+			}
 			String buyTime = getBuyTimeText().getText().trim();
 			String duration = getDurationText().getText().trim();
 			Config.customRule = new CustomRule(buyTime,duration);
@@ -198,7 +241,8 @@ public abstract class AbstractXiaoMiFunction {
 				loadLog();
 				//任务完成
 				finishMsg();
-				
+				//链接分析完成
+				parse();
 				if (!getDisplay().readAndDispatch()) {
 					try {
 						Thread.sleep(150);
@@ -213,6 +257,22 @@ public abstract class AbstractXiaoMiFunction {
 		
 		
 		
+		public void parse() {
+			Label msgText = getMsg();
+			
+			if(ParseCount.intValue()<GoodsInfo.ParseCount.intValue()){
+				ParseCount.incrementAndGet();
+				if(StatusManage.isParse){
+					initOption();
+				}
+				if(StatusManage.endMsg!=null&&StatusManage.endMsg.length()!=0){
+					sendErrMsg(StatusManage.endMsg);
+				}
+				msgText.setVisible(false);
+				modifyStatus(true);
+			}
+			
+		}
 		//错误弹框
 		public void sendErrMsg(String msg) {
 			MessageBox errorBox = new MessageBox(getShell(), SWT.ICON_ERROR);
