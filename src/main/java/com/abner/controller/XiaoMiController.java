@@ -42,7 +42,7 @@ public class XiaoMiController {
 		logger.info("user:{},buyUrl:{}",Config.user,Config.goodsInfo.getBuyUrl());
 		StatusManage.isLogin = false;
 		Config.submitCount = new AtomicInteger(0);
-		xiaomiService.keeplogin();
+		xiaomiService.login();
 		xiaomiService.start();
 		
 		

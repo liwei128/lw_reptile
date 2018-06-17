@@ -65,8 +65,13 @@ public class XiaoMiService {
 		if(oldUser.getCookies()==null||oldUser.getCookies().size()==0){
 			return false;
 		}
-		String result = httpService.execute(FilePathManage.checkLoginStatusJs,"");
-		if(result.equals("true")){
+		boolean isUserId = false;
+		for(Cookie cook : oldUser.getCookies()){
+			if("userId".equals(cook.getName())){
+				isUserId = true;
+			}
+		}
+		if(isUserId){
 			Config.user.setCookies(oldUser.getCookies());
 			return true;
 		}
@@ -77,11 +82,11 @@ public class XiaoMiService {
 	/**
 	 * 保持登录状态
 	 */
-	@Timing(initialDelay = 0, period = 10, type = TimingType.FIXED_RATE, unit = TimeUnit.MINUTES)
-	public void keeplogin() {
+	@Async
+	public void login() {
 		if(!islogin()){
 			StatusManage.isLogin = false;
-			login();
+			tologin();
 			StatusManage.isLogin = true;
 		}else{
 			logger.info("用户:{} 已登录。",Config.user.getUserName());
@@ -90,7 +95,7 @@ public class XiaoMiService {
 	}
 	
 	@Retry2(success = "ok")
-	public String login() {
+	public String tologin() {
 		long start = System.currentTimeMillis();
 		FileUtil.writeToFile(JsonUtil.toString(Config.user), FilePathManage.userConfig);
 		String result = httpService.execute(FilePathManage.loginJs,"");
@@ -140,7 +145,9 @@ public class XiaoMiService {
 	public void start(){
 		//购买
 		buy = MyThreadPool.schedule(()->{
-			logger.info("开始抢购。。。");
+			if(StatusManage.isLogin){
+				logger.info("开始抢购。。。");
+			}
 			buyGoodsTask();
 			
 		}, Config.customRule.getBuyTime()-System.currentTimeMillis(), TimeUnit.MILLISECONDS);
@@ -150,7 +157,7 @@ public class XiaoMiService {
 		}, Config.customRule.getEndTime()-System.currentTimeMillis(), TimeUnit.MILLISECONDS);
 
 	}
-	@Stop(methods = { "buyGoodsTask" ,"keeplogin"})
+	@Stop(methods = { "buyGoodsTask"})
 	public void stop(String msg) {
 		logger.info(msg);
 		StatusManage.endMsg = msg;
