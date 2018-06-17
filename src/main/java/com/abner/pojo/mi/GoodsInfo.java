@@ -17,6 +17,7 @@ public class GoodsInfo {
 	
 	public static final String BASE_BUYURL = "https://cart.mi.com/cart/add/";
 	
+	
 	public static final AtomicInteger ParseCount = new AtomicInteger(0);
 	
 	//商品名
@@ -27,6 +28,9 @@ public class GoodsInfo {
 	
 	//商品购买请求Url
 	private String buyUrl;
+	
+	//抢购时需要用到的随机码
+	private String randomCode;
 	
 	//选项1：版本
 	private List<String> version;
@@ -87,6 +91,14 @@ public class GoodsInfo {
 		this.buyUrl = buyUrl;
 	}
 	
+	public String getRandomCode() {
+		return randomCode;
+	}
+
+	public void setRandomCode(String randomCode) {
+		this.randomCode = randomCode;
+	}
+
 	@Override
 	public String toString() {
 		return JsonUtil.toString(this);
@@ -103,7 +115,7 @@ public class GoodsInfo {
 	
 	public String randomBuyUrl() {
 		long timeMillis = System.currentTimeMillis();
-		return this.buyUrl+"?jsonpcallback=jQuery111309129049260578808_"+timeMillis+"&_="+timeMillis;
+		return this.buyUrl+randomCode+"_"+(timeMillis-1)+"&_="+timeMillis;
 	}
 
 	public void selectBuyUrl(int index) throws Exception{

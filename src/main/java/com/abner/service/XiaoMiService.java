@@ -46,6 +46,8 @@ public class XiaoMiService {
 	
 	private ScheduledFuture<?> stop;
 	
+	private ScheduledFuture<?> randomCode;
+	
 	
 	public boolean islogin(){
 		if(!FileUtil.isFile(FilePathManage.userConfig)){
@@ -124,7 +126,7 @@ public class XiaoMiService {
 	 */
 	@Timing(initialDelay = 0, period = 400, type = TimingType.FIXED_RATE, unit = TimeUnit.MILLISECONDS)
 	public void buyGoodsTask() {
-		if(StatusManage.isLogin){
+		if(StatusManage.isLogin&&Config.goodsInfo.getRandomCode()!=null){
 			buy(Config.goodsInfo.randomBuyUrl(),Config.user.getCookies());
 		}
 	}
@@ -143,6 +145,12 @@ public class XiaoMiService {
 	}
 	
 	public void start(){
+		//获取随机码
+		randomCode = MyThreadPool.schedule(()->{
+			logger.info("开始获取随机码。。。");
+			getRandomCode();
+			
+		}, Config.customRule.getBuyTime()-System.currentTimeMillis()-30*1000, TimeUnit.MILLISECONDS);
 		//购买
 		buy = MyThreadPool.schedule(()->{
 			if(StatusManage.isLogin){
@@ -157,6 +165,15 @@ public class XiaoMiService {
 		}, Config.customRule.getEndTime()-System.currentTimeMillis(), TimeUnit.MILLISECONDS);
 
 	}
+	@Retry2(success = "ok")
+	public String getRandomCode() {
+		String string = httpService.execute(FilePathManage.randomCodeJs, Config.goodsInfo.getUrl());
+		String randomCode = string.substring(string.indexOf("?"), string.indexOf("_"));
+		logger.info("随机码:{}",randomCode);
+		Config.goodsInfo.setRandomCode(randomCode);
+		return "ok";
+	}
+
 	@Stop(methods = { "buyGoodsTask"})
 	public void stop(String msg) {
 		logger.info(msg);
@@ -167,6 +184,9 @@ public class XiaoMiService {
 		
 		if(stop!=null){
 			stop.cancel(false);//停止 截止时间的定时器
+		}
+		if(randomCode!=null){
+			stop.cancel(false);//停止随机码获取
 		}
 
 		StatusManage.isEnd = true;
