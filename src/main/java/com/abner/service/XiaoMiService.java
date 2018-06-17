@@ -175,17 +175,20 @@ public class XiaoMiService {
 	public void parseUrl(String url) {
 		try{
 			if(!url.startsWith(GoodsInfo.BASE_INFOURL)){
+				StatusManage.isParse = false;
 				StatusManage.endMsg = "链接地址错误";
 				return ;
 			}
 			String result = httpService.execute(FilePathManage.buyGoodsJs,url);
 			logger.info(result);
 			if(result.length()==0){
+				StatusManage.isParse = false;
 				StatusManage.endMsg = "链接地址分析失败";
 				return ;
 			}
 			GoodsInfo goodsInfo = JsonUtil.toBean(result, GoodsInfo.class);
 			if(goodsInfo==null||goodsInfo.getGoodsIds()==null||goodsInfo.getGoodsIds().size()==0){
+				StatusManage.isParse = false;
 				StatusManage.endMsg = "链接地址分析失败";
 				return ;
 			}
@@ -194,6 +197,7 @@ public class XiaoMiService {
 			StatusManage.isParse = true;
 			StatusManage.endMsg = "";
 		}catch (Exception e) {
+			StatusManage.isParse = false;
 			StatusManage.endMsg = "链接地址分析失败";
 		}finally {
 			GoodsInfo.ParseCount.incrementAndGet();
