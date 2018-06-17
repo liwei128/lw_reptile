@@ -105,7 +105,6 @@ public class XiaoMiService {
 			logger.error("用户:{} 登录失败,时间:{}ms,正准备重试。。。建议清空缓存。",Config.user.getUserName(),System.currentTimeMillis()-start);
 			return "fail";
 		}else if(result.equals("pwd")){
-			logger.error("用户名或密码错误！");
 			stop("用户名或密码错误！");
 			return "ok";
 		}else{
