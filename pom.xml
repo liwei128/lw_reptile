@@ -54,12 +54,6 @@
 		  <artifactId>jackson-annotations</artifactId>
 		  <version>2.9.2</version>
 	  </dependency>
-	  
-	  <dependency>
-	    <groupId>com.alibaba</groupId>
-	    <artifactId>fastjson</artifactId>
-	    <version>1.2.47</version>
-	  </dependency>
 
 
 	  <!-- log4j日志框架 -->

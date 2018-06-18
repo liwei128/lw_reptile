@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Date;
-import java.util.List;
 import java.util.Properties;
 import javax.mail.Session;
 import javax.mail.Transport;
@@ -16,7 +15,6 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 import org.apache.http.HttpEntity;
-import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -25,7 +23,6 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.DefaultConnectionKeepAliveStrategy;
 import org.apache.http.impl.client.DefaultRedirectStrategy;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.message.BasicHeader;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +38,6 @@ import com.abner.exception.GetUrlException;
 import com.abner.manage.Config;
 import com.abner.manage.FilePathManage;
 import com.abner.pojo.FileDownloadDto;
-import com.abner.pojo.mi.Cookie;
 import com.abner.utils.FileUtil;
 
 /**
@@ -131,84 +127,6 @@ public class HttpService {
 				p.destroy();
 			}
 		}		
-	}
-	/**
-	 * 执行phantomjs
-	 * @param jsPath
-	 * @return
-	 */
-	public String execute(String jsPath,String url){
-		Process p=null;
-		try {
-			p= Runtime.getRuntime().exec(FilePathManage.exe+" " +jsPath+" "+url);
-			PhantomjsStorage.add(p);
-			InputStream is = p.getInputStream(); 
-			BufferedReader br = new BufferedReader(new InputStreamReader(is,"UTF-8")); 
-			StringBuffer sbf = new StringBuffer();  
-			String tmp = "";  
-			while((tmp = br.readLine())!=null){  
-				   sbf.append(tmp); 
-			}
-			br.close();
-			is.close();
-			return sbf.toString();
-		} catch (Exception e) {
-			FileUtil.copyFile(FilePathManage.exeBackups,FilePathManage.exe);
-			logger.error("Phantomjs请求异常,js:{}",jsPath);
-			return "";
-		}finally {
-			if(p!=null){
-				p.destroy();
-			}
-		}		
-	}
-	/**
-	 * 携带cookies请求网页
-	 * @param url
-	 * @param cookies
-	 * @return
-	 */
-	public String getByCookies(String url,List<Cookie> cookies){
-		CloseableHttpClient httpClient = createCookiesHttpClient();
-    	CloseableHttpResponse response=null;
-		try{
-    		HttpGet httpGet = new HttpGet(url);
-    		httpGet.addHeader(new BasicHeader("Cookie",builderCookiesStr(cookies)));
-    		httpGet.setHeader("Connection", "keep-alive");
-       		httpGet.setHeader("User-Agent", "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Mobile Safari/537.36");
-            response = httpClient.execute(httpGet);
-            return toString(response);
-            
-		}catch(Exception e){
-			logger.info("链接:"+url+"异常");
-			return null;
-    	}finally{
-    		closeStream(response);
-    	}
-	}
-	
-	private String builderCookiesStr(List<Cookie> cookies) {
-		StringBuilder str = new StringBuilder();
-		cookies.forEach(o->{
-			str.append(o.getName()).append("=").append(o.getValue()).append(";");
-		});
-		return str.toString();
-	}
-	/**
-	 * 携带cookies的HttpClient
-	 * @param cookies
-	 * @return
-	 */
-	private CloseableHttpClient createCookiesHttpClient() {
-
-		RequestConfig requestConfig = RequestConfig.custom().setCookieSpec(CookieSpecs.STANDARD_STRICT).setConnectTimeout(10000).setSocketTimeout(10000)  
-                       .setConnectionRequestTimeout(10000).build();
-        // 设置默认跳转以及存储cookie  
-        CloseableHttpClient httpClient = HttpClientBuilder.create()  
-                     .setKeepAliveStrategy(new DefaultConnectionKeepAliveStrategy())  
-                     .setRedirectStrategy(new DefaultRedirectStrategy()).setDefaultRequestConfig(requestConfig)  
-                     .setDefaultCookieStore(new BasicCookieStore()).build(); 
-		return httpClient;
 	}
 	
 	

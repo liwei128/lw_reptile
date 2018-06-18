@@ -18,17 +18,6 @@ public class StatusManage {
 	//联网标志
 	public static volatile int ping = 999;
 	
-	//登录状态
-	public static volatile boolean isLogin = false;
-
-	//抢购结束标志
-	public static volatile boolean isEnd = false;
-	
-	//是否解析成功
-	public static volatile boolean isParse = false;
-	
-	//结束消息
-	public static volatile String endMsg = "";
 	
 	
 }
