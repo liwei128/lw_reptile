@@ -41,9 +41,9 @@ public class CustomRule {
 	public void builderTime(String startTime,String duration) throws Exception{
 
 		int minute = Integer.parseInt(duration);
-		if(minute>5){
-			throw new Exception("抢购时长不得超过5分钟");
-		}
+//		if(minute>5){
+//			throw new Exception("抢购时长不得超过5分钟");
+//		}
 		if(minute<=0){
 			throw new Exception("抢购时长必须大于0");
 		}
